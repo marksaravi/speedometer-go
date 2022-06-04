@@ -1,5 +1,12 @@
 module github.com/marksaravi/speedometer-go
 
-go 1.17
+go 1.18
 
-require github.com/marksaravi/fonts-go v0.0.0-20220529120428-630e5c44e8bf // indirect
+require github.com/marksaravi/fonts-go v0.1.0
+
+require github.com/marksaravi/devices-go v1.1.0
+
+require (
+	periph.io/x/conn/v3 v3.6.10 // indirect
+	periph.io/x/host/v3 v3.7.2 // indirect
+)
