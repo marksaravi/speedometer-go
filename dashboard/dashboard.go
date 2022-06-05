@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/marksaravi/devices-go/devices/display"
@@ -57,4 +58,8 @@ func (d *dashboardDisplay) calcAverageSpeed() {
 
 func (d *dashboardDisplay) reset() {
 
+}
+
+func toDeg(r float64) float64 {
+	return r / 180 * math.Pi
 }
