@@ -11,7 +11,7 @@ func (d *dashboardDisplay) initBackground() {
 	d.drwaSpeedsBackground()
 	d.drawSpeed(MAX_SPEED)
 	d.drawSpeed(MAX_SPEED / 5)
-	d.drawSpeed(0)
-	d.drawSpeed(MAX_SPEED / 2)
+	// d.drawSpeed(0)
+	// d.drawSpeed(MAX_SPEED / 2)
 	d.display.Update()
 }

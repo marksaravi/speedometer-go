@@ -1,6 +1,10 @@
 package dashboard
 
-import "github.com/marksaravi/devices-go/colors/rgb565"
+import (
+	"math"
+
+	"github.com/marksaravi/devices-go/colors/rgb565"
+)
 
 // RGB565 colors
 const (
@@ -12,10 +16,12 @@ const (
 
 // colors
 const (
-	BACKGROUNG_COLOR rgb565.RGB565 = ROYAL_BLUE
-	SPEED_CURVE_DASH rgb565.RGB565 = GHOST_WHITE
-	SPEED_FORWARD                  = FLORECENT_GREEN
-	SPEED_BACKWARD                 = BACKGROUNG_COLOR
+	BACKGROUNG_COLOR     rgb565.RGB565 = ROYAL_BLUE
+	SPEED_CURVE_DASH     rgb565.RGB565 = GHOST_WHITE
+	SPEED_FORWARD_SAFE                 = rgb565.GREEN
+	SPEED_FORWARD_WARN                 = rgb565.YELLOW
+	SPEED_FORWARD_DANGER               = rgb565.RED
+	SPEED_BACKWARD                     = BACKGROUNG_COLOR
 )
 
 // basic dimensions
@@ -31,9 +37,9 @@ const (
 
 // speed curve
 const (
-	SPEED_CURVE_RESOLUTION  float64 = 5   // km/h
-	SPEED_CURVE_START_ANGLE float64 = 90  // degree
-	SPEED_CURVE_END_ANGLE   float64 = 300 // degree
+	SPEED_CURVE_RESOLUTION  float64 = 5              // km/h
+	SPEED_CURVE_START_ANGLE float64 = math.Pi / 2    // 90 degree
+	SPEED_CURVE_END_ANGLE   float64 = 1.67 * math.Pi // 300 degree
 	SPEED_CURVE_WIDTH       float64 = VIEW_HEIGHT / 12
 	SPEED_CURVE_RADIUS      float64 = VIEW_HEIGHT/2 - SPEED_CURVE_WIDTH/2
 	SPEED_CURVE_CENTER_X    float64 = VIEW_LEFT + VIEW_HEIGHT/2
@@ -42,5 +48,7 @@ const (
 )
 
 const (
-	MAX_SPEED float64 = 60 // km/h
+	MAX_SPEED         float64 = 50 // km/h
+	MAX_SAFE_SPEED    float64 = 20
+	MAX_WARNING_SPEED float64 = 30
 )
