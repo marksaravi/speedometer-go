@@ -12,8 +12,8 @@ const (
 
 // colors
 const (
-	backgroung_color  rgb565.RGB565 = LAWN_GREEN
-	speed_curve_1kmph rgb565.RGB565 = GHOST_WHITE
+	BACKGROUNG_COLOR rgb565.RGB565 = ROYAL_BLUE
+	SPEED_CURVE_DASH rgb565.RGB565 = GHOST_WHITE
 )
 
 // basic dimensions
@@ -27,13 +27,18 @@ const (
 	VIEW_TOP               = SCREEN_PADDING
 )
 
+// speed curve
 const (
-	MAX_SPEED                 float64 = 60  // km/h
-	SPEED_RESOLUTION          float64 = 2   // km/h
-	SPEED_CURVE_START_ANGLE   float64 = 90  // degree
-	SPEED_CURVE_END_ANGLE     float64 = 300 // degree
-	SPEED_CURVE_CENTER_X      float64 = 120
-	SPEED_CURVE_CENTER_Y      float64 = 120
-	SPEED_CURVE_CENTER_RADIUS float64 = 110
-	SPEED_CURVE_CENTER_WIDTH  float64 = 20
+	SPEED_CURVE_RESOLUTION  float64 = 5   // km/h
+	SPEED_CURVE_START_ANGLE float64 = 90  // degree
+	SPEED_CURVE_END_ANGLE   float64 = 300 // degree
+	SPEED_CURVE_WIDTH       float64 = 20
+	SPEED_CURVE_RADIUS      float64 = VIEW_HEIGHT/2 - SPEED_CURVE_WIDTH/2
+	SPEED_CURVE_CENTER_X    float64 = VIEW_LEFT + VIEW_HEIGHT/2
+	SPEED_CURVE_CENTER_Y    float64 = VIEW_TOP + VIEW_HEIGHT/2
+	SPEED_CURVE_DASH_LEN    float64 = 5
+)
+
+const (
+	MAX_SPEED float64 = 60 // km/h
 )
