@@ -26,12 +26,13 @@ func (d *dashboardDisplay) drawSpeedCurveResolution(angle float64) {
 	y2 := SPEED_CURVE_CENTER_Y + (r-SPEED_CURVE_DASH_LEN)*math.Sin(angle)
 	d.display.Line(x1, y1, x2, y2)
 }
+
 func (d *dashboardDisplay) drawSpeed(speed float64) {
 	if speed == d.prevSpeed {
 		return
 	}
 
-	dSpeed := 0.1
+	dSpeed := MAX_SPEED / 60
 	if speed < d.prevSpeed {
 		dSpeed = -dSpeed
 	}
