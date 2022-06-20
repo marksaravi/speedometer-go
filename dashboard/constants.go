@@ -14,6 +14,8 @@ const (
 const (
 	BACKGROUNG_COLOR rgb565.RGB565 = ROYAL_BLUE
 	SPEED_CURVE_DASH rgb565.RGB565 = GHOST_WHITE
+	SPEED_FORWARD                  = FLORECENT_GREEN
+	SPEED_BACKWARD                 = BACKGROUNG_COLOR
 )
 
 // basic dimensions

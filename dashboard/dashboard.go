@@ -2,19 +2,20 @@ package dashboard
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/marksaravi/devices-go/devices/display"
 )
 
 type dashboardDisplay struct {
-	display display.RGB565Display
+	display   display.RGB565Display
+	prevSpeed float64
 }
 
 func NewDashboardDisplay(display display.RGB565Display) (chan<- time.Time, chan<- bool) {
 	d := dashboardDisplay{
-		display: display,
+		display:   display,
+		prevSpeed: 0,
 	}
 	return d.start()
 }
@@ -58,8 +59,4 @@ func (d *dashboardDisplay) calcAverageSpeed() {
 
 func (d *dashboardDisplay) reset() {
 
-}
-
-func toDeg(r float64) float64 {
-	return r / 180 * math.Pi
 }
