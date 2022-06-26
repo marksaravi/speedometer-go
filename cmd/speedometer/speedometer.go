@@ -36,11 +36,13 @@ func createDisplay() (chan<- time.Time, chan<- bool) {
 	spiConn := createSPIConnection(0, 0)
 	dataCommandSelect := createGpioOutPin("GPIO22")
 	reset := createGpioOutPin("GPIO23")
-	var display display.RGB565Display
-	var err error
-	display = ili9341.NewILI9341(spiConn, dataCommandSelect, reset)
+
+	ili9341Dev, err := ili9341.NewILI9341(spiConn, dataCommandSelect, reset)
+	var ili9341Display display.RGBDisplay
+	ili9341Display = display.NewRGBDisplay(ili9341Dev)
 	checkFatalErr(err)
-	return dashboard.NewDashboardDisplay(display)
+	checkFatalErr(err)
+	return dashboard.NewDashboardDisplay(ili9341Display)
 }
 
 func createGpioOutPin(gpioPinNum string) gpio.PinOut {

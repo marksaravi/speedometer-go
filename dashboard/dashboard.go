@@ -8,11 +8,11 @@ import (
 )
 
 type dashboardDisplay struct {
-	display   display.RGB565Display
+	display   display.RGBDisplay
 	prevSpeed float64
 }
 
-func NewDashboardDisplay(display display.RGB565Display) (chan<- time.Time, chan<- bool) {
+func NewDashboardDisplay(display display.RGBDisplay) (chan<- time.Time, chan<- bool) {
 	d := dashboardDisplay{
 		display:   display,
 		prevSpeed: 0,

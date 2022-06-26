@@ -3,25 +3,16 @@ package dashboard
 import (
 	"math"
 
-	"github.com/marksaravi/devices-go/colors/rgb565"
+	"github.com/marksaravi/devices-go/colors"
 )
 
-// RGB565 colors
 const (
-	FLORECENT_GREEN rgb565.RGB565 = 0x1FE3
-	LAWN_GREEN      rgb565.RGB565 = 0x7FC0
-	ROYAL_BLUE      rgb565.RGB565 = 0x3B3B
-	GHOST_WHITE     rgb565.RGB565 = 0xF7BF
-)
-
-// colors
-const (
-	BACKGROUNG_COLOR     rgb565.RGB565 = ROYAL_BLUE
-	SPEED_CURVE_DASH     rgb565.RGB565 = GHOST_WHITE
-	SPEED_FORWARD_SAFE                 = rgb565.GREEN
-	SPEED_FORWARD_WARN                 = rgb565.YELLOW
-	SPEED_FORWARD_DANGER               = rgb565.RED
-	SPEED_BACKWARD                     = BACKGROUNG_COLOR
+	BACKGROUNG_COLOR     = colors.ROYALBLUE
+	SPEED_CURVE_DASH     = colors.GHOSTWHITE
+	SPEED_FORWARD_SAFE   = colors.GREEN
+	SPEED_FORWARD_WARN   = colors.YELLOW
+	SPEED_FORWARD_DANGER = colors.RED
+	SPEED_BACKWARD       = BACKGROUNG_COLOR
 )
 
 // basic dimensions
@@ -37,9 +28,9 @@ const (
 
 // speed curve
 const (
-	SPEED_CURVE_RESOLUTION  float64 = 5              // km/h
-	SPEED_CURVE_START_ANGLE float64 = math.Pi / 2    // 90 degree
-	SPEED_CURVE_END_ANGLE   float64 = 1.67 * math.Pi // 300 degree
+	SPEED_CURVE_RESOLUTION  float64 = 5           // km/h
+	SPEED_CURVE_START_ANGLE float64 = 0           // math.Pi / 2    // 90 degree
+	SPEED_CURVE_END_ANGLE   float64 = 2 * math.Pi // 1.67 * math.Pi // 300 degree
 	SPEED_CURVE_WIDTH       float64 = VIEW_HEIGHT / 12
 	SPEED_CURVE_RADIUS      float64 = VIEW_HEIGHT/2 - SPEED_CURVE_WIDTH/2
 	SPEED_CURVE_CENTER_X    float64 = VIEW_LEFT + VIEW_HEIGHT/2
