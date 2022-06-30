@@ -3,12 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
-	"math"
 	"time"
 
-	"github.com/marksaravi/devices-go/colors/rgb565"
 	"github.com/marksaravi/devices-go/devices/display"
 	"github.com/marksaravi/devices-go/hardware/ili9341"
+	"github.com/marksaravi/speedometer-go/dashboard"
 	"periph.io/x/conn/v3/gpio"
 	"periph.io/x/conn/v3/gpio/gpioreg"
 	"periph.io/x/conn/v3/physic"
@@ -17,35 +16,33 @@ import (
 	"periph.io/x/host/v3/sysfs"
 )
 
-func checkFatalErr(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
+func main() {
+	_, _ = createDisplay()
+	time.Sleep(time.Second)
+	// counter := 0
+	// for {
+	// 	time.Sleep(time.Second / 8)
+	// 	pulse <- time.Now()
+	// 	if counter == 100 {
+	// 		counter = 0
+	// 		reset <- true
+	// 	}
+	// 	counter++
+	// }
 }
 
-func main() {
-	fmt.Println("Starting Speedometer")
+func createDisplay() (chan<- time.Time, chan<- bool) {
 	host.Init()
 	spiConn := createSPIConnection(0, 0)
 	dataCommandSelect := createGpioOutPin("GPIO22")
 	reset := createGpioOutPin("GPIO23")
-	var display display.RGB565Display
-	var err error
-	display, err = ili9341.NewILI9341(spiConn, dataCommandSelect, reset)
-	checkFatalErr(err)
-	testShapes(display)
-	time.Sleep(1000 * time.Millisecond)
-}
 
-func testShapes(display display.RGB565Display) {
-	display.SetBackgroundColor(rgb565.BLUE)
-	display.Clear()
-	display.SetColor(rgb565.YELLOW)
-	display.Circle(50, 50, 30)
-	display.SetColor(rgb565.GREEN)
-	display.FillCircle(100, 100, 30)
-	display.Arc(120, 120, 118, -math.Pi/4, math.Pi/4, 40)
-	display.Update()
+	ili9341Dev, err := ili9341.NewILI9341(spiConn, dataCommandSelect, reset)
+	var ili9341Display display.RGBDisplay
+	ili9341Display = display.NewRGBDisplay(ili9341Dev)
+	checkFatalErr(err)
+	checkFatalErr(err)
+	return dashboard.NewDashboardDisplay(ili9341Display)
 }
 
 func createGpioOutPin(gpioPinNum string) gpio.PinOut {
@@ -69,4 +66,9 @@ func createSPIConnection(busNumber int, chipSelect int) spi.Conn {
 	)
 	checkFatalErr(err)
 	return spiConn
+}
+func checkFatalErr(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }
