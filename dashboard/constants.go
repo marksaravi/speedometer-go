@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	BACKGROUNG_COLOR     = colors.ROYALBLUE
+	BACKGROUNG_COLOR     = colors.WHITE
 	SPEED_CURVE_DASH     = colors.GHOSTWHITE
 	SPEED_FORWARD_SAFE   = colors.GREEN
 	SPEED_FORWARD_WARN   = colors.YELLOW
