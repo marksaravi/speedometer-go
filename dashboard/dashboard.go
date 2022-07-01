@@ -8,7 +8,6 @@ import (
 
 type dashboardDisplay struct {
 	display display.RGBDisplay
-	x, y    float64
 }
 
 func NewDashboardDisplay(display display.RGBDisplay) *dashboardDisplay {

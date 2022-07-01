@@ -19,18 +19,18 @@ const (
 
 // basic dimensions
 const (
-	TOP_MARGIN           int = 16
+	TOP_MARGIN           int = 32
 	LEFT_MARGIN          int = 16
 	SPEED_LINE_HEIGHT    int = 32
-	DISTANCE_LINE_HEIGHT int = 64
-	DURATION_LINE_HEIGHT int = 96
+	DISTANCE_LINE_HEIGHT int = 48
+	DURATION_LINE_HEIGHT int = 48
 	LABEL_COLUMN         int = 0
 	DATA_COLUMN          int = 200
 )
 
 // Fonts
 var (
-	SPEED_FONT    fonts.BitmapFont = fonts.FreeMono18pt7b
-	DISTANCE_FONT fonts.BitmapFont = fonts.FreeMono18pt7b
-	DURATION_FONT fonts.BitmapFont = fonts.FreeMono18pt7b
+	SPEED_FONT    fonts.BitmapFont = fonts.FreeMono24pt7b
+	DISTANCE_FONT fonts.BitmapFont = fonts.FreeMono12pt7b
+	DURATION_FONT fonts.BitmapFont = fonts.FreeMono12pt7b
 )

@@ -28,4 +28,20 @@ func (d *dashboardDisplay) printLabels() {
 		TOP_MARGIN,
 	)
 	d.display.Write("Speed:")
+	d.setFont(
+		DISTANCE_FONT,
+		DISTANCE_LABEL_COLOR,
+		DISTANCE_LINE_HEIGHT,
+		LEFT_MARGIN+LABEL_COLUMN,
+		TOP_MARGIN+SPEED_LINE_HEIGHT,
+	)
+	d.display.Write("Distance:")
+	d.setFont(
+		DURATION_FONT,
+		DURATION_LABEL_COLOR,
+		DURATION_LINE_HEIGHT,
+		LEFT_MARGIN+LABEL_COLUMN,
+		TOP_MARGIN+SPEED_LINE_HEIGHT+DISTANCE_LINE_HEIGHT,
+	)
+	d.display.Write("Duration:")
 }
