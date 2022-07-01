@@ -16,9 +16,14 @@ import (
 	"periph.io/x/host/v3/sysfs"
 )
 
+type lcd interface {
+	Initialise()
+	Update(speed, distanceKm float64, duration time.Duration)
+}
+
 func main() {
-	_, _ = createDisplay()
-	time.Sleep(time.Second)
+	lcddisplay := createDisplay()
+	lcddisplay.Initialise()
 	// counter := 0
 	// for {
 	// 	time.Sleep(time.Second / 8)
@@ -31,7 +36,7 @@ func main() {
 	// }
 }
 
-func createDisplay() (chan<- time.Time, chan<- bool) {
+func createDisplay() lcd {
 	host.Init()
 	spiConn := createSPIConnection(0, 0)
 	dataCommandSelect := createGpioOutPin("GPIO22")
