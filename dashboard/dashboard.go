@@ -7,12 +7,18 @@ import (
 )
 
 type dashboardDisplay struct {
-	display display.RGBDisplay
+	display  display.RGBDisplay
+	speed    float64
+	distance float64
+	duration time.Duration
 }
 
 func NewDashboardDisplay(display display.RGBDisplay) *dashboardDisplay {
 	return &dashboardDisplay{
-		display: display,
+		display:  display,
+		speed:    0,
+		distance: 0,
+		duration: 0,
 	}
 }
 
