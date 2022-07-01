@@ -1,79 +1,20 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"time"
-
-	"github.com/marksaravi/devices-go/devices/display"
-	"github.com/marksaravi/devices-go/hardware/ili9341"
-	"github.com/marksaravi/speedometer-go/dashboard"
-	"periph.io/x/conn/v3/gpio"
-	"periph.io/x/conn/v3/gpio/gpioreg"
-	"periph.io/x/conn/v3/physic"
-	"periph.io/x/conn/v3/spi"
-	"periph.io/x/host/v3"
-	"periph.io/x/host/v3/sysfs"
 )
 
-type lcd interface {
+type lcdDisplay interface {
 	Initialise()
-	Update(speed, distanceKm float64, duration time.Duration)
+	Update(speed, distance float64, duration time.Duration)
 }
 
 func main() {
-	lcddisplay := createDisplay()
-	lcddisplay.Initialise()
-	// counter := 0
-	// for {
-	// 	time.Sleep(time.Second / 8)
-	// 	pulse <- time.Now()
-	// 	if counter == 100 {
-	// 		counter = 0
-	// 		reset <- true
-	// 	}
-	// 	counter++
-	// }
+	lcd := createDisplay()
+	lcd.Initialise()
+	process(lcd)
 }
 
-func createDisplay() lcd {
-	host.Init()
-	spiConn := createSPIConnection(0, 0)
-	dataCommandSelect := createGpioOutPin("GPIO22")
-	reset := createGpioOutPin("GPIO23")
-
-	ili9341Dev, err := ili9341.NewILI9341(spiConn, dataCommandSelect, reset)
-	var ili9341Display display.RGBDisplay
-	ili9341Display = display.NewRGBDisplay(ili9341Dev)
-	checkFatalErr(err)
-	checkFatalErr(err)
-	return dashboard.NewDashboardDisplay(ili9341Display)
-}
-
-func createGpioOutPin(gpioPinNum string) gpio.PinOut {
-	var pin gpio.PinOut = gpioreg.ByName(gpioPinNum)
-	if pin == nil {
-		checkFatalErr(fmt.Errorf("failed to create GPIO pin %s", gpioPinNum))
-	}
-	pin.Out(gpio.Low)
-	return pin
-}
-
-func createSPIConnection(busNumber int, chipSelect int) spi.Conn {
-	spibus, _ := sysfs.NewSPI(
-		busNumber,
-		chipSelect,
-	)
-	spiConn, err := spibus.Connect(
-		physic.Frequency(12)*physic.MegaHertz,
-		spi.Mode3,
-		8,
-	)
-	checkFatalErr(err)
-	return spiConn
-}
-func checkFatalErr(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
+func process(lcd lcdDisplay) {
+	lcd.Update(17.3, 847.45, time.Second*4325)
 }

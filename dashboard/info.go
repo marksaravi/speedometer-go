@@ -43,7 +43,11 @@ func (d *dashboardDisplay) printDistance(distance float64) {
 }
 
 func (d *dashboardDisplay) printDuration(dur time.Duration) {
-	sec := int(dur.Seconds()) % 60
+	if dur-d.duration < DURATION_RESOLUTION {
+		return
+	}
+	d.duration = dur
+	sec := int(d.duration.Seconds()) % 60
 	min := sec / 60 % 60
 	hour := sec / 3600
 	d.setFont(

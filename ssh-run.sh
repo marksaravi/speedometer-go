@@ -6,6 +6,7 @@ copy_codes(){
     scp "./$1/$2" "$raspizero:/home/pi/go/src/speedometer-go/$1/"
 }
 
+copy_codes cmd/speedometer initialise.go
 copy_codes cmd/speedometer speedometer.go
 copy_codes dashboard info.go
 copy_codes dashboard constants.go
