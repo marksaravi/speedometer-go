@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/marksaravi/devices-go/colors"
@@ -9,6 +10,7 @@ import (
 )
 
 func (d *dashboardDisplay) initBackground() {
+	fmt.Println("func initBackground")
 	d.display.SetBackgroundColor(BACKGROUNG_COLOR)
 	d.display.Clear()
 	d.display.SetColor(colors.WHEAT)
