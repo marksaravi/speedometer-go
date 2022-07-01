@@ -1,0 +1,55 @@
+package dashboard
+
+import (
+	"fmt"
+	"math"
+	"time"
+)
+
+func (d *dashboardDisplay) printSpeed(speed float64) {
+	if math.Abs(d.speed-speed) < SPEED_RESOLUTION {
+		return
+	}
+	d.speed = speed
+	d.setFont(
+		SPEED_DATA_FONT,
+		SPEED_DATA_COLOR,
+		SPEED_LINE_HEIGHT,
+		LEFT_MARGIN+DATA_COLUMN,
+		TOP_MARGIN,
+	)
+	d.display.Write(fmt.Sprintf("%3.1f", d.speed))
+}
+
+func (d *dashboardDisplay) printDistance(distance float64) {
+	if math.Abs(d.distance-distance) < DISTANCE_RESOLUTION {
+		return
+	}
+	d.distance = distance
+	d.setFont(
+		DISTANCE_DATA_FONT,
+		DISTANCE_LABEL_COLOR,
+		DISTANCE_LINE_HEIGHT,
+		LEFT_MARGIN+DATA_COLUMN,
+		TOP_MARGIN+SPEED_LINE_HEIGHT,
+	)
+	d.display.Write(fmt.Sprintf("%5.3f", distance/1000))
+}
+
+func (d *dashboardDisplay) printDuration(dur time.Duration) {
+	if dur-d.duration < DURATION_RESOLUTION {
+		return
+	}
+	d.duration = dur
+	sec := int(d.duration.Seconds()) % 60
+	min := sec / 60 % 60
+	hour := sec / 3600
+	d.setFont(
+		DURATION_DATA_FONT,
+		DURATION_LABEL_COLOR,
+		DURATION_LINE_HEIGHT,
+		LEFT_MARGIN+DATA_COLUMN,
+		TOP_MARGIN+SPEED_LINE_HEIGHT+DISTANCE_LINE_HEIGHT,
+	)
+	d.display.Write(fmt.Sprintf("%02d:%02d:%02d", hour, min, sec))
+}

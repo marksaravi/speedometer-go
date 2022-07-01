@@ -2,73 +2,50 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"time"
 
-	"github.com/marksaravi/devices-go/devices/display"
-	"github.com/marksaravi/devices-go/hardware/ili9341"
-	"github.com/marksaravi/speedometer-go/dashboard"
 	"periph.io/x/conn/v3/gpio"
-	"periph.io/x/conn/v3/gpio/gpioreg"
-	"periph.io/x/conn/v3/physic"
-	"periph.io/x/conn/v3/spi"
-	"periph.io/x/host/v3"
-	"periph.io/x/host/v3/sysfs"
 )
 
+type lcdDisplay interface {
+	Initialise()
+	Update(speed, distance float64, duration time.Duration)
+}
+
 func main() {
-	_, _ = createDisplay()
-	time.Sleep(time.Second)
-	// counter := 0
-	// for {
-	// 	time.Sleep(time.Second / 8)
-	// 	pulse <- time.Now()
-	// 	if counter == 100 {
-	// 		counter = 0
-	// 		reset <- true
-	// 	}
-	// 	counter++
-	// }
+	lcd := createDisplay()
+	lcd.Initialise()
+	input := createGpioInputPin("GPIO6")
+	process(lcd, input)
 }
 
-func createDisplay() (chan<- time.Time, chan<- bool) {
-	host.Init()
-	spiConn := createSPIConnection(0, 0)
-	dataCommandSelect := createGpioOutPin("GPIO22")
-	reset := createGpioOutPin("GPIO23")
+func process(lcd lcdDisplay, input gpio.PinIn) {
+	const PERIMETER float64 = 2.2
+	const PULSE_PER_PERIMETER = 8
+	const DIST_PER_PULSE = PERIMETER / PULSE_PER_PERIMETER
 
-	ili9341Dev, err := ili9341.NewILI9341(spiConn, dataCommandSelect, reset)
-	var ili9341Display display.RGBDisplay
-	ili9341Display = display.NewRGBDisplay(ili9341Dev)
-	checkFatalErr(err)
-	checkFatalErr(err)
-	return dashboard.NewDashboardDisplay(ili9341Display)
-}
+	start := time.Now()
+	var counter int = 0
+	ts := time.Now()
+	prevTime := time.Now()
+	currTime := time.Now()
+	for {
+		time.Sleep(time.Millisecond * 10)
+		input.Read()
+		counter++
+		currTime = time.Now()
+		dt := currTime.Sub(prevTime)
+		prevTime = currTime
+		speed := DIST_PER_PULSE / dt.Seconds() * 1000 / 3600
+		dur := time.Since(start)
+		distance := DIST_PER_PULSE * float64(counter)
 
-func createGpioOutPin(gpioPinNum string) gpio.PinOut {
-	var pin gpio.PinOut = gpioreg.ByName(gpioPinNum)
-	if pin == nil {
-		checkFatalErr(fmt.Errorf("failed to create GPIO pin %s", gpioPinNum))
-	}
-	pin.Out(gpio.Low)
-	return pin
-}
-
-func createSPIConnection(busNumber int, chipSelect int) spi.Conn {
-	spibus, _ := sysfs.NewSPI(
-		busNumber,
-		chipSelect,
-	)
-	spiConn, err := spibus.Connect(
-		physic.Frequency(12)*physic.MegaHertz,
-		spi.Mode3,
-		8,
-	)
-	checkFatalErr(err)
-	return spiConn
-}
-func checkFatalErr(err error) {
-	if err != nil {
-		log.Fatal(err)
+		if time.Since(ts) >= time.Second {
+			fmt.Println(counter)
+			ts = time.Now()
+			func() {
+				lcd.Update(speed, distance, dur)
+			}()
+		}
 	}
 }
