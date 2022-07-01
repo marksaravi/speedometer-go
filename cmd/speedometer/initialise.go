@@ -37,6 +37,17 @@ func createGpioOutPin(gpioPinNum string) gpio.PinOut {
 	return pin
 }
 
+func createGpioInputPin(gpioPinNum string) gpio.PinIn {
+	var pin gpio.PinIn = gpioreg.ByName(gpioPinNum)
+	if pin == nil {
+		log.Fatal(fmt.Errorf("failed to create GPIO pin %s", gpioPinNum))
+	}
+	if err := pin.In(gpio.PullDown, gpio.RisingEdge); err != nil {
+		log.Fatal(err)
+	}
+	return pin
+}
+
 func createSPIConnection(busNumber int, chipSelect int) spi.Conn {
 	spibus, _ := sysfs.NewSPI(
 		busNumber,
