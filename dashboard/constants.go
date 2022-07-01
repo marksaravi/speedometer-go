@@ -13,7 +13,7 @@ const (
 	SPEED_LABEL_COLOR    = LABEL_COLOR
 	DISTANCE_LABEL_COLOR = LABEL_COLOR
 	DURATION_LABEL_COLOR = LABEL_COLOR
-	DATA_COLOR           = colors.BEIGE
+	DATA_COLOR           = colors.RED
 	SPEED_DATA_COLOR     = DATA_COLOR
 	DISTANCE_DATA_COLOR  = DATA_COLOR
 	DURATION_DATA_COLOR  = DATA_COLOR
@@ -21,20 +21,25 @@ const (
 
 // basic dimensions
 const (
-	TOP_MARGIN           int = 32
+	TOP_MARGIN           int = 0
 	LEFT_MARGIN          int = 16
-	SPEED_LINE_HEIGHT    int = 32
-	DISTANCE_LINE_HEIGHT int = 48
-	DURATION_LINE_HEIGHT int = 48
+	SPEED_LINE_HEIGHT    int = 64
+	DISTANCE_LINE_HEIGHT int = 64
+	DURATION_LINE_HEIGHT int = 64
 	LABEL_COLUMN         int = 0
-	DATA_COLUMN          int = 200
+	DATA_COLUMN          int = 120
 )
 
 // Fonts
 var (
-	SPEED_FONT    fonts.BitmapFont = fonts.FreeMono24pt7b
-	DISTANCE_FONT fonts.BitmapFont = fonts.FreeMono12pt7b
-	DURATION_FONT fonts.BitmapFont = fonts.FreeMono12pt7b
+	LABEL_FONT          fonts.BitmapFont = fonts.FreeSans9pt7b
+	SPEED_LABEL_FONT    fonts.BitmapFont = LABEL_FONT
+	DISTANCE_LABEL_FONT fonts.BitmapFont = LABEL_FONT
+	DURATION_LABEL_FONT fonts.BitmapFont = LABEL_FONT
+
+	SPEED_DATA_FONT    fonts.BitmapFont = fonts.FreeSans24pt7b
+	DISTANCE_DATA_FONT fonts.BitmapFont = fonts.FreeSans18pt7b
+	DURATION_DATA_FONT fonts.BitmapFont = fonts.FreeSans18pt7b
 )
 
 const (

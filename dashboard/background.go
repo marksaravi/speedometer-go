@@ -21,23 +21,23 @@ func (d *dashboardDisplay) setFont(font fonts.BitmapFont, color colors.Color, li
 
 func (d *dashboardDisplay) printLabels() {
 	d.setFont(
-		SPEED_FONT,
+		SPEED_LABEL_FONT,
 		SPEED_LABEL_COLOR,
 		SPEED_LINE_HEIGHT,
 		LEFT_MARGIN+LABEL_COLUMN,
 		TOP_MARGIN,
 	)
-	d.display.Write("Speed:")
+	d.display.Write("Speed (km/h):")
 	d.setFont(
-		DISTANCE_FONT,
+		DISTANCE_LABEL_FONT,
 		DISTANCE_LABEL_COLOR,
 		DISTANCE_LINE_HEIGHT,
 		LEFT_MARGIN+LABEL_COLUMN,
 		TOP_MARGIN+SPEED_LINE_HEIGHT,
 	)
-	d.display.Write("Distance:")
+	d.display.Write("Distance (km):")
 	d.setFont(
-		DURATION_FONT,
+		DURATION_LABEL_FONT,
 		DURATION_LABEL_COLOR,
 		DURATION_LINE_HEIGHT,
 		LEFT_MARGIN+LABEL_COLUMN,
