@@ -1,6 +1,8 @@
 package dashboard
 
 import (
+	"time"
+
 	"github.com/marksaravi/devices-go/colors"
 	"github.com/marksaravi/fonts-go/fonts"
 )
@@ -33,4 +35,10 @@ var (
 	SPEED_FONT    fonts.BitmapFont = fonts.FreeMono24pt7b
 	DISTANCE_FONT fonts.BitmapFont = fonts.FreeMono12pt7b
 	DURATION_FONT fonts.BitmapFont = fonts.FreeMono12pt7b
+)
+
+const (
+	SPEED_RESOLUTION    float64       = 0.5
+	DISTANCE_RESOLUTION float64       = 10
+	DURATION_RESOLUTION time.Duration = time.Second
 )

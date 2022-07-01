@@ -8,8 +8,8 @@ import (
 
 type dashboardDisplay struct {
 	display  display.RGBDisplay
-	speed    float64
-	distance float64
+	speed    float64 // km/hour
+	distance float64 // meter
 	duration time.Duration
 }
 
@@ -25,4 +25,10 @@ func NewDashboardDisplay(display display.RGBDisplay) *dashboardDisplay {
 func (d *dashboardDisplay) Initialise() {
 	d.initBackground()
 }
-func (d *dashboardDisplay) Update(speed, distanceKm float64, duration time.Duration) {}
+
+func (d *dashboardDisplay) Update(speed, distance float64, duration time.Duration) {
+	d.printSpeed(speed)
+	d.printDistance(distance)
+	d.printDuration(duration)
+	d.display.Update()
+}
