@@ -20,7 +20,7 @@ func NewDashboardDisplay(display display.RGBDisplay) *dashboardDisplay {
 		speed:    0,
 		distance: 0,
 		duration: 0,
-		theme:    LightTheme,
+		theme:    DarkTheme,
 	}
 }
 

@@ -39,16 +39,27 @@ const (
 const (
 	LIGHT_LABEL_COLOR = colors.BLACK
 	LIGHT_DATA_COLOR  = colors.RED
+
+	DARK_LABEL_COLOR = colors.WHITE
+	DARK_DATA_COLOR  = colors.YELLOW
 )
 
 var LightTheme = Theme{
 	BackgroungColor:    colors.WHITE,
-	LabelColor:         colors.BLACK,
 	SpeedLabelColor:    LIGHT_LABEL_COLOR,
 	DistanceLabelColor: LIGHT_LABEL_COLOR,
 	DurationLabelColor: LIGHT_LABEL_COLOR,
-	DataColor:          colors.RED,
 	SpeedDataColor:     LIGHT_DATA_COLOR,
 	DistanceDataColor:  LIGHT_DATA_COLOR,
 	DurationDataColor:  LIGHT_DATA_COLOR,
+}
+
+var DarkTheme = Theme{
+	BackgroungColor:    colors.DARKGRAY,
+	SpeedLabelColor:    DARK_LABEL_COLOR,
+	DistanceLabelColor: DARK_LABEL_COLOR,
+	DurationLabelColor: DARK_LABEL_COLOR,
+	SpeedDataColor:     DARK_DATA_COLOR,
+	DistanceDataColor:  DARK_DATA_COLOR,
+	DurationDataColor:  DARK_DATA_COLOR,
 }
