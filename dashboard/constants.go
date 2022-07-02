@@ -34,6 +34,9 @@ const (
 	SPEED_RESOLUTION    float64       = 0.5
 	DISTANCE_RESOLUTION float64       = 10
 	DURATION_RESOLUTION time.Duration = time.Second
+	SEC_CHANGED         TimeChanged   = 0
+	MIN_CHANGED         TimeChanged   = 1
+	HOUR_CHANGED        TimeChanged   = 2
 )
 
 const (
