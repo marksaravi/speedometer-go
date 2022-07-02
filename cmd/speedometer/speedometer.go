@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -76,6 +77,7 @@ func (s *speedometer) process() {
 		time.Sleep(time.Millisecond)
 		if time.Since(lastUpdate) >= time.Second {
 			lastUpdate = time.Now()
+			fmt.Println(s.counter, speed, distance)
 			s.update(speed, distance, changed)
 		}
 
@@ -95,7 +97,7 @@ func (s *speedometer) readPulse() (float64, float64, bool) {
 	var speed float64 = 0
 	changed := false
 	if pulse != s.pulse {
-		if pulse == gpio.High {
+		if pulse == gpio.Low {
 			s.counter++
 			s.pulseDur = time.Since(s.pulseTime)
 			s.pulseTime = time.Now()
