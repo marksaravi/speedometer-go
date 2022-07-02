@@ -10,7 +10,7 @@ copy_codes(){
 # copy_codes ./ go.mod
 # copy_codes ./ go.sum
 # copy_codes cmd/speedometer initialise.go
-# copy_codes cmd/speedometer speedometer.go
+copy_codes cmd/speedometer speedometer.go
 copy_codes dashboard info.go
 # copy_codes dashboard constants.go
 copy_codes dashboard dashboard.go

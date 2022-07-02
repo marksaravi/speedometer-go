@@ -9,8 +9,8 @@ func (d *dashboardDisplay) initBackground() {
 	d.display.SetBackgroundColor(d.theme.BackgroungColor)
 	d.display.Clear()
 	d.printLabels()
-	d.printDuration(0, true)
-	d.printDuration(0, false)
+	d.printDurationDigits(0)
+	d.printDurationColons()
 	d.display.Update()
 }
 
@@ -46,4 +46,23 @@ func (d *dashboardDisplay) printLabels() {
 		TOP_MARGIN+SPEED_LINE_HEIGHT+DISTANCE_LINE_HEIGHT,
 	)
 	d.display.Write("Duration:")
+}
+
+func (d *dashboardDisplay) printDurationColons() {
+	drawDigit := func(x, y int) {
+		d.display.MoveCursor(x+DIGIT_WIDTH+4, y)
+		d.display.Write(":")
+	}
+	x := LEFT_MARGIN + DATA_COLUMN
+	y := TOP_MARGIN + SPEED_LINE_HEIGHT + DISTANCE_LINE_HEIGHT
+	d.setFont(
+		DURATION_DATA_FONT,
+		d.theme.DurationDataColor,
+		DURATION_LINE_HEIGHT,
+		x,
+		y,
+	)
+	drawDigit(x, y)
+	x += DIGIT_WIDTH + COLON_WIDTH
+	drawDigit(x, y)
 }
