@@ -6,9 +6,9 @@ import (
 	"periph.io/x/conn/v3/gpio"
 )
 
-const PERIMETER float64 = 2.2
-const PULSE_PER_PERIMETER = 8
-const DIST_PER_PULSE = PERIMETER / PULSE_PER_PERIMETER
+type Config struct {
+	DistancePerPulse float64 `json:"distance-per-pulse"`
+}
 
 type lcdDisplay interface {
 	Initialise()
@@ -26,7 +26,8 @@ type speedometer struct {
 	prevReset gpio.Level
 	resetTime time.Time
 
-	speed float64
+	distPerPulse float64
+	speed        float64
 
 	input gpio.PinIn
 	reset gpio.PinIn
@@ -36,6 +37,7 @@ type speedometer struct {
 func main() {
 	lcd := createDisplay()
 	lcd.Initialise()
+
 	speedo := speedometer{
 		startTime:     time.Now(),
 		counter:       0,
@@ -45,7 +47,8 @@ func main() {
 		prevReset:     gpio.Low,
 		resetTime:     time.Now(),
 
-		speed: 0,
+		distPerPulse: 0.275,
+		speed:        0,
 
 		input: createGpioInputPin("GPIO14"),
 		reset: createGpioInputPin("GPIO15"),
@@ -83,7 +86,7 @@ func (s *speedometer) readPulse() {
 			s.counter++
 			s.pulseDur = time.Since(s.prevPulseTime)
 			s.prevPulseTime = time.Now()
-			s.speed = DIST_PER_PULSE / s.pulseDur.Seconds() * 1000 / 3600
+			s.speed = s.distPerPulse / s.pulseDur.Seconds() * 1000 / 3600
 		}
 		s.prevPulse = pulse
 	}
@@ -102,7 +105,7 @@ func (s *speedometer) readReset() {
 }
 
 func (s *speedometer) update() {
-	distance := DIST_PER_PULSE * float64(s.counter)
+	distance := s.distPerPulse * float64(s.counter)
 	dur := time.Since(s.startTime)
 	func() {
 		s.lcd.Update(s.speed, distance, dur)
