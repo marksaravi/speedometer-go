@@ -11,6 +11,7 @@ type dashboardDisplay struct {
 	speed    float64 // km/hour
 	distance float64 // meter
 	duration time.Duration
+	theme    Theme
 }
 
 func NewDashboardDisplay(display display.RGBDisplay) *dashboardDisplay {
@@ -19,6 +20,7 @@ func NewDashboardDisplay(display display.RGBDisplay) *dashboardDisplay {
 		speed:    0,
 		distance: 0,
 		duration: 0,
+		theme:    LightTheme,
 	}
 }
 

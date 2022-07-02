@@ -7,18 +7,6 @@ import (
 	"github.com/marksaravi/fonts-go/fonts"
 )
 
-const (
-	BACKGROUNG_COLOR     = colors.WHITE
-	LABEL_COLOR          = colors.BLACK
-	SPEED_LABEL_COLOR    = LABEL_COLOR
-	DISTANCE_LABEL_COLOR = LABEL_COLOR
-	DURATION_LABEL_COLOR = LABEL_COLOR
-	DATA_COLOR           = colors.RED
-	SPEED_DATA_COLOR     = DATA_COLOR
-	DISTANCE_DATA_COLOR  = DATA_COLOR
-	DURATION_DATA_COLOR  = DATA_COLOR
-)
-
 // basic dimensions
 const (
 	TOP_MARGIN           int = 0
@@ -47,3 +35,20 @@ const (
 	DISTANCE_RESOLUTION float64       = 10
 	DURATION_RESOLUTION time.Duration = time.Second
 )
+
+const (
+	LIGHT_LABEL_COLOR = colors.BLACK
+	LIGHT_DATA_COLOR  = colors.RED
+)
+
+var LightTheme = Theme{
+	BackgroungColor:    colors.WHITE,
+	LabelColor:         colors.BLACK,
+	SpeedLabelColor:    LIGHT_LABEL_COLOR,
+	DistanceLabelColor: LIGHT_LABEL_COLOR,
+	DurationLabelColor: LIGHT_LABEL_COLOR,
+	DataColor:          colors.RED,
+	SpeedDataColor:     LIGHT_DATA_COLOR,
+	DistanceDataColor:  LIGHT_DATA_COLOR,
+	DurationDataColor:  LIGHT_DATA_COLOR,
+}

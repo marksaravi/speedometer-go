@@ -6,7 +6,7 @@ import (
 )
 
 func (d *dashboardDisplay) initBackground() {
-	d.display.SetBackgroundColor(BACKGROUNG_COLOR)
+	d.display.SetBackgroundColor(d.theme.BackgroungColor)
 	d.display.Clear()
 	d.printLabels()
 	d.display.Update()
@@ -22,7 +22,7 @@ func (d *dashboardDisplay) setFont(font fonts.BitmapFont, color colors.Color, li
 func (d *dashboardDisplay) printLabels() {
 	d.setFont(
 		SPEED_LABEL_FONT,
-		SPEED_LABEL_COLOR,
+		d.theme.SpeedLabelColor,
 		SPEED_LINE_HEIGHT,
 		LEFT_MARGIN+LABEL_COLUMN,
 		TOP_MARGIN,
@@ -30,7 +30,7 @@ func (d *dashboardDisplay) printLabels() {
 	d.display.Write("Speed (km/h):")
 	d.setFont(
 		DISTANCE_LABEL_FONT,
-		DISTANCE_LABEL_COLOR,
+		d.theme.DistanceLabelColor,
 		DISTANCE_LINE_HEIGHT,
 		LEFT_MARGIN+LABEL_COLUMN,
 		TOP_MARGIN+SPEED_LINE_HEIGHT,
@@ -38,7 +38,7 @@ func (d *dashboardDisplay) printLabels() {
 	d.display.Write("Distance (km):")
 	d.setFont(
 		DURATION_LABEL_FONT,
-		DURATION_LABEL_COLOR,
+		d.theme.DurationLabelColor,
 		DURATION_LINE_HEIGHT,
 		LEFT_MARGIN+LABEL_COLUMN,
 		TOP_MARGIN+SPEED_LINE_HEIGHT+DISTANCE_LINE_HEIGHT,

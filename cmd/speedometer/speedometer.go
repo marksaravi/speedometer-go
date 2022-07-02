@@ -35,6 +35,7 @@ type speedometer struct {
 }
 
 func main() {
+	config := ReadConfigs()
 	lcd := createDisplay()
 	lcd.Initialise()
 
@@ -47,7 +48,7 @@ func main() {
 		prevReset:     gpio.Low,
 		resetTime:     time.Now(),
 
-		distPerPulse: 0.275,
+		distPerPulse: config.DistancePerPulse,
 		speed:        0,
 
 		input: createGpioInputPin("GPIO14"),

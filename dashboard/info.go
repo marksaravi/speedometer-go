@@ -13,7 +13,7 @@ func (d *dashboardDisplay) printSpeed(speed float64) {
 	d.speed = speed
 	d.setFont(
 		SPEED_DATA_FONT,
-		SPEED_DATA_COLOR,
+		d.theme.SpeedDataColor,
 		SPEED_LINE_HEIGHT,
 		LEFT_MARGIN+DATA_COLUMN,
 		TOP_MARGIN,
@@ -28,7 +28,7 @@ func (d *dashboardDisplay) printDistance(distance float64) {
 	d.distance = distance
 	d.setFont(
 		DISTANCE_DATA_FONT,
-		DISTANCE_LABEL_COLOR,
+		d.theme.DistanceDataColor,
 		DISTANCE_LINE_HEIGHT,
 		LEFT_MARGIN+DATA_COLUMN,
 		TOP_MARGIN+SPEED_LINE_HEIGHT,
@@ -46,7 +46,7 @@ func (d *dashboardDisplay) printDuration(dur time.Duration) {
 	hour := sec / 3600
 	d.setFont(
 		DURATION_DATA_FONT,
-		DURATION_LABEL_COLOR,
+		d.theme.DurationDataColor,
 		DURATION_LINE_HEIGHT,
 		LEFT_MARGIN+DATA_COLUMN,
 		TOP_MARGIN+SPEED_LINE_HEIGHT+DISTANCE_LINE_HEIGHT,
