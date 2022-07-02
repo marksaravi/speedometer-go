@@ -28,6 +28,9 @@ type speedometer struct {
 
 	distPerPulse float64
 	speed        float64
+	sec          int
+	min          int
+	hour         int
 
 	input gpio.PinIn
 	reset gpio.PinIn
@@ -50,6 +53,9 @@ func main() {
 
 		distPerPulse: config.DistancePerPulse,
 		speed:        0,
+		sec:          0,
+		min:          0,
+		hour:         0,
 
 		input: createGpioInputPin("GPIO14"),
 		reset: createGpioInputPin("GPIO15"),

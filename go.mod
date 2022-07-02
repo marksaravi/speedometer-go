@@ -4,7 +4,7 @@ go 1.18
 
 require github.com/marksaravi/fonts-go v0.1.0
 
-require github.com/marksaravi/devices-go v1.2.0
+require github.com/marksaravi/devices-go v1.3.0
 
 require (
 	periph.io/x/conn/v3 v3.6.10 // indirect
