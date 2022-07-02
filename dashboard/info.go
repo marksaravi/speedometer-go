@@ -2,14 +2,13 @@ package dashboard
 
 import (
 	"fmt"
-	"math"
 )
 
 const DIGIT_WIDTH int = 36
 const COLON_WIDTH int = 14
 
-func (d *dashboardDisplay) printSpeed(speed float64) {
-	if math.Abs(d.speed-speed) < SPEED_RESOLUTION {
+func (d *dashboardDisplay) printSpeed(speed float64, speedChanged bool) {
+	if !speedChanged {
 		return
 	}
 	d.speed = speed
@@ -23,8 +22,8 @@ func (d *dashboardDisplay) printSpeed(speed float64) {
 	d.display.Write(fmt.Sprintf("%3.1f", d.speed))
 }
 
-func (d *dashboardDisplay) printDistance(distance float64) {
-	if math.Abs(d.distance-distance) < DISTANCE_RESOLUTION {
+func (d *dashboardDisplay) printDistance(distance float64, distanceChanged bool) {
+	if !distanceChanged {
 		return
 	}
 	d.distance = distance
