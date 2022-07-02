@@ -25,11 +25,12 @@ func (d *dashboardDisplay) Initialise() {
 	d.initBackground()
 }
 
-func (d *dashboardDisplay) Update(speed, distance float64, sec, min, hour int, minChanged, hourChanged bool) {
+func (d *dashboardDisplay) Update(speed, distance float64, sec, min, hour int, secChanged, minChanged, hourChanged bool) {
 	d.printSpeed(speed)
 	d.printDistance(distance)
-
-	d.printDurationDigits(sec, SEC_CHANGED)
+	if secChanged {
+		d.printDurationDigits(sec, SEC_CHANGED)
+	}
 	if minChanged {
 		d.printDurationDigits(min, MIN_CHANGED)
 	}

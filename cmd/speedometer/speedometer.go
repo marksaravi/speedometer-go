@@ -12,7 +12,7 @@ type Config struct {
 
 type lcdDisplay interface {
 	Initialise()
-	Update(speed, distance float64, sec, min, hour int, minChanged, hourChanged bool)
+	Update(speed, distance float64, sec, min, hour int, secChanged, minChanged, hourChanged bool)
 }
 
 type speedometer struct {
@@ -28,6 +28,7 @@ type speedometer struct {
 
 	distPerPulse float64
 	speed        float64
+	sec          int
 	min          int
 	hour         int
 
@@ -52,6 +53,7 @@ func main() {
 
 		distPerPulse: config.DistancePerPulse,
 		speed:        0,
+		sec:          0,
 		min:          0,
 		hour:         0,
 
@@ -111,16 +113,23 @@ func (s *speedometer) readReset() {
 
 func (s *speedometer) update() {
 	distance := s.distPerPulse * float64(s.counter)
+	sec, min, hour, secChanged, minChanged, hourChanged := s.getDurationChanges()
+	func() {
+		s.lcd.Update(s.speed, distance, sec, min, hour, secChanged, minChanged, hourChanged)
+	}()
+}
+
+func (s *speedometer) getDurationChanges() (int, int, int, bool, bool, bool) {
 	dur := time.Since(s.startTime)
 	sec := int(dur.Seconds()) % 60
 	min := sec / 60 % 60
 	hour := sec / 3600
 
+	secChanged := sec != s.sec
+	s.sec = sec
 	minChanged := min != s.min
 	s.min = min
 	hourChanged := hour != s.hour
 	s.hour = hour
-	func() {
-		s.lcd.Update(s.speed, distance, sec, min, hour, minChanged, hourChanged)
-	}()
+	return sec, min, hour, secChanged, minChanged, hourChanged
 }
