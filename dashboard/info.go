@@ -37,6 +37,17 @@ func (d *dashboardDisplay) printDistance(distance float64) {
 }
 
 func (d *dashboardDisplay) printDuration(dur time.Duration) {
+	const DIGIT_WIDTH int = 36
+	const COLON_WIDTH int = 14
+	drawDigit := func(digit, x, y int, colon bool) {
+		d.display.ClearArea(float64(x), float64(y), float64(x+DIGIT_WIDTH), float64(y+DURATION_LINE_HEIGHT))
+		d.display.MoveCursor(x, y)
+		d.display.Write(fmt.Sprintf("%02d", digit))
+		if colon {
+			d.display.MoveCursor(x+DIGIT_WIDTH+4, y)
+			d.display.Write(":")
+		}
+	}
 	sec := int(dur.Seconds()) % 60
 	min := sec / 60 % 60
 	hour := sec / 3600
@@ -50,20 +61,10 @@ func (d *dashboardDisplay) printDuration(dur time.Duration) {
 		y,
 	)
 	// d.display.Write(fmt.Sprintf("%02d:%02d:%02d", hour, min, sec))
-	d.display.Write(fmt.Sprintf("%02d", hour))
-	x += 32
-	d.display.MoveCursor(x, y)
-	d.display.Write(":")
 
-	x += 16
-	d.display.MoveCursor(x, y)
-	d.display.Write(fmt.Sprintf("%02d", min))
-
-	x += 16
-	d.display.MoveCursor(x, y)
-	d.display.Write(":")
-
-	x += 16
-	d.display.MoveCursor(x, y)
-	d.display.Write(fmt.Sprintf("%02d", sec))
+	drawDigit(hour, x, y, true)
+	x += DIGIT_WIDTH + COLON_WIDTH
+	drawDigit(min, x, y, true)
+	x += DIGIT_WIDTH + COLON_WIDTH
+	drawDigit(sec, x, y, false)
 }
