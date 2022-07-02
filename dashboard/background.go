@@ -9,6 +9,8 @@ func (d *dashboardDisplay) initBackground() {
 	d.display.SetBackgroundColor(d.theme.BackgroungColor)
 	d.display.Clear()
 	d.printLabels()
+	d.printDuration(0, true)
+	d.printDuration(0, false)
 	d.display.Update()
 }
 

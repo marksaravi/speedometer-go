@@ -29,6 +29,6 @@ func (d *dashboardDisplay) Initialise() {
 func (d *dashboardDisplay) Update(speed, distance float64, duration time.Duration) {
 	d.printSpeed(speed)
 	d.printDistance(distance)
-	d.printDuration(duration)
+	d.printDuration(duration, true)
 	d.display.Update()
 }
