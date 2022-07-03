@@ -1,16 +1,15 @@
 package dashboard
 
 import (
-	"time"
-
 	"github.com/marksaravi/devices-go/devices/display"
 )
 
+type TimeChanged = int
 type dashboardDisplay struct {
 	display  display.RGBDisplay
 	speed    float64 // km/hour
 	distance float64 // meter
-	duration time.Duration
+	theme    Theme
 }
 
 func NewDashboardDisplay(display display.RGBDisplay) *dashboardDisplay {
@@ -18,7 +17,7 @@ func NewDashboardDisplay(display display.RGBDisplay) *dashboardDisplay {
 		display:  display,
 		speed:    0,
 		distance: 0,
-		duration: 0,
+		theme:    DarkTheme,
 	}
 }
 
@@ -26,9 +25,26 @@ func (d *dashboardDisplay) Initialise() {
 	d.initBackground()
 }
 
-func (d *dashboardDisplay) Update(speed, distance float64, duration time.Duration) {
+func (d *dashboardDisplay) UpdateSpeed(speed float64) {
 	d.printSpeed(speed)
+}
+
+func (d *dashboardDisplay) UpdateDistance(distance float64) {
 	d.printDistance(distance)
-	d.printDuration(duration)
+}
+
+func (d *dashboardDisplay) UpdateSecond(seconds int) {
+	d.printDurationDigits(seconds, SECOND_CHANGED)
+}
+
+func (d *dashboardDisplay) UpdateMinute(minutes int) {
+	d.printDurationDigits(minutes, MINUTE_CHANGED)
+}
+
+func (d *dashboardDisplay) UpdateHour(hours int) {
+	d.printDurationDigits(hours, HOUR_CHANGED)
+}
+
+func (d *dashboardDisplay) UpdateDisplay() {
 	d.display.Update()
 }

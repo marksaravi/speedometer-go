@@ -1,22 +1,8 @@
 package dashboard
 
 import (
-	"time"
-
 	"github.com/marksaravi/devices-go/colors"
 	"github.com/marksaravi/fonts-go/fonts"
-)
-
-const (
-	BACKGROUNG_COLOR     = colors.WHITE
-	LABEL_COLOR          = colors.BLACK
-	SPEED_LABEL_COLOR    = LABEL_COLOR
-	DISTANCE_LABEL_COLOR = LABEL_COLOR
-	DURATION_LABEL_COLOR = LABEL_COLOR
-	DATA_COLOR           = colors.RED
-	SPEED_DATA_COLOR     = DATA_COLOR
-	DISTANCE_DATA_COLOR  = DATA_COLOR
-	DURATION_DATA_COLOR  = DATA_COLOR
 )
 
 // basic dimensions
@@ -43,7 +29,35 @@ var (
 )
 
 const (
-	SPEED_RESOLUTION    float64       = 0.5
-	DISTANCE_RESOLUTION float64       = 10
-	DURATION_RESOLUTION time.Duration = time.Second
+	SECOND_CHANGED TimeChanged = 0
+	MINUTE_CHANGED TimeChanged = 1
+	HOUR_CHANGED   TimeChanged = 2
 )
+
+const (
+	LIGHT_LABEL_COLOR = colors.BLACK
+	LIGHT_DATA_COLOR  = colors.RED
+
+	DARK_LABEL_COLOR = colors.WHITE
+	DARK_DATA_COLOR  = colors.YELLOW
+)
+
+var LightTheme = Theme{
+	BackgroungColor:    colors.WHITE,
+	SpeedLabelColor:    LIGHT_LABEL_COLOR,
+	DistanceLabelColor: LIGHT_LABEL_COLOR,
+	DurationLabelColor: LIGHT_LABEL_COLOR,
+	SpeedDataColor:     LIGHT_DATA_COLOR,
+	DistanceDataColor:  LIGHT_DATA_COLOR,
+	DurationDataColor:  LIGHT_DATA_COLOR,
+}
+
+var DarkTheme = Theme{
+	BackgroungColor:    colors.DARKGRAY,
+	SpeedLabelColor:    DARK_LABEL_COLOR,
+	DistanceLabelColor: DARK_LABEL_COLOR,
+	DurationLabelColor: DARK_LABEL_COLOR,
+	SpeedDataColor:     DARK_DATA_COLOR,
+	DistanceDataColor:  DARK_DATA_COLOR,
+	DurationDataColor:  DARK_DATA_COLOR,
+}

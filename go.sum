@@ -5,6 +5,8 @@ github.com/marksaravi/devices-go v1.1.0 h1:Wcikvd858oMf850GcV8aO8dt73t82pidZDkWy
 github.com/marksaravi/devices-go v1.1.0/go.mod h1:wbTZTskP879LiVNJnt1YDNL20ZMbvELc5PfEwtSzFj8=
 github.com/marksaravi/devices-go v1.2.0 h1:pkr1kg/loc7L3n97gJWibruf96aVOsmp+YOG+6AYjpo=
 github.com/marksaravi/devices-go v1.2.0/go.mod h1:wbTZTskP879LiVNJnt1YDNL20ZMbvELc5PfEwtSzFj8=
+github.com/marksaravi/devices-go v1.3.0 h1:7m9hoHv1/wR6ti4s/s9UW74mFmyIWh5JCJe0Oy2tieo=
+github.com/marksaravi/devices-go v1.3.0/go.mod h1:wbTZTskP879LiVNJnt1YDNL20ZMbvELc5PfEwtSzFj8=
 github.com/marksaravi/fonts-go v0.0.0-20220529120428-630e5c44e8bf h1:DmlX9oOnV+YeHcNtL/LsZEsHovVcpmGF6TLg3Y/aljk=
 github.com/marksaravi/fonts-go v0.0.0-20220529120428-630e5c44e8bf/go.mod h1:G20Ju8c7mDqQFqjhHwP2yjDM4Upc0BYIEh00NSWDGHY=
 github.com/marksaravi/fonts-go v0.1.0 h1:EjR3Qxjs4yA24dLrmk4pe3CXiJfGVvUaCwsgPjGPpNA=

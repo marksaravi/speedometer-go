@@ -1,7 +1,9 @@
-package main
+package speedometer
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 
 	"github.com/marksaravi/devices-go/devices/display"
@@ -61,8 +63,19 @@ func createSPIConnection(busNumber int, chipSelect int) spi.Conn {
 	checkFatalErr(err)
 	return spiConn
 }
+
 func checkFatalErr(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func ReadConfigs() Config {
+	content, err := ioutil.ReadFile("./config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	var configs Config
+	json.Unmarshal([]byte(content), &configs)
+	return configs
 }
