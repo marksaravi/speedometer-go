@@ -109,7 +109,7 @@ func (s *speedometerDev) updateSpeedDistanceDuration() {
 		s.speedPulses = s.speedPulses[1:]
 	}
 	s.speed = s.distPerPulse / speedPulseDur.Seconds() * 3.6
-	if s.speed < 0.1 {
+	if s.speed < 0.2 {
 		s.speed = 0
 	}
 
