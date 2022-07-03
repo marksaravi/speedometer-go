@@ -43,11 +43,11 @@ func (s *speedometerDev) Run() {
 			s.speed = speed
 			s.distance = distance
 		}
-		if time.Since(lastUpdate) >= time.Millisecond*900 {
+		if time.Since(lastUpdate) >= time.Millisecond*500 {
 			s.update()
 			lastUpdate = time.Now()
 			if pulsed {
-				time.Sleep(time.Microsecond * time.Duration(s.sleepAfterPulseMS))
+				time.Sleep(time.Millisecond * time.Duration(s.sleepAfterPulseMS))
 			}
 		}
 		s.readReset()

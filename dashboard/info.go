@@ -58,7 +58,6 @@ func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
 	}
 	x += DIGIT_WIDTH + COLON_WIDTH
 	if change == SECOND_CHANGED {
-		fmt.Println("SECOND: ", t)
 		drawDigit(t, x, y)
 	}
 }
