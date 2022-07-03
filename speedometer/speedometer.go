@@ -5,7 +5,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/marksaravi/speedometer-go/dashboard"
 	"periph.io/x/conn/v3/gpio"
 )
 
@@ -32,9 +31,7 @@ func NewSpeedometer() *speedometerDev {
 
 		speed:    0,
 		distance: 0,
-		sec:      0,
-		min:      0,
-		hour:     0,
+		dur:      0,
 	}
 	return &speedo
 }
@@ -97,19 +94,17 @@ func (s *speedometerDev) readReset() {
 	}
 }
 
-func (s *speedometerDev) getDurationChanges() (bool, bool, bool) {
+func (s *speedometerDev) updateDuration() (int, int, int, bool, bool, bool) {
 	dur := time.Since(s.startTime)
-	sec := int(dur.Seconds()) % 60
-	min := sec / 60 % 60
-	hour := sec / 3600
+	seconds := int(dur.Seconds()) % 60
+	minutes := seconds / 60 % 60
+	hours := seconds / 3600
 
-	secChanged := sec != s.sec
-	s.sec = sec
-	minChanged := min != s.min
-	s.min = min
-	hourChanged := hour != s.hour
-	s.hour = hour
-	return secChanged, minChanged, hourChanged
+	prevSeconds := int(s.dur.Seconds()) % 60
+	prevMinutes := prevSeconds / 60 % 60
+	prevHours := prevSeconds / 3600
+	s.dur = dur
+	return seconds, minutes, hours, seconds != prevSeconds, minutes != prevMinutes, hours != prevHours
 }
 
 func (s *speedometerDev) updateSpeed(speed float64) bool {
@@ -129,21 +124,32 @@ func (s *speedometerDev) updateDistance(distance float64) bool {
 }
 
 func (s *speedometerDev) update(speed, distance float64, changed bool) {
-	secChanged, minChanged, hourChanged := s.getDurationChanges()
+	seconds, minutes, hours, secondsChanged, minutesChanged, hoursChanged := s.updateDuration()
 	speedChanged := s.updateSpeed(speed)
 	distanceChanged := s.updateDistance(distance)
 	func() {
-		s.lcd.Update(dashboard.DisplayData{
-			Speed:           s.speed,
-			SpeedChanged:    speedChanged,
-			Distance:        s.distance,
-			DistanceChanged: distanceChanged,
-			Sec:             s.sec,
-			SecChanged:      secChanged,
-			Min:             s.min,
-			MinChanged:      minChanged,
-			Hour:            s.hour,
-			HourChanged:     hourChanged,
-		})
+		changed := false
+		if secondsChanged {
+			s.lcd.UpdateSecond(seconds)
+			changed = true
+		}
+		if minutesChanged {
+			s.lcd.UpdateSecond(minutes)
+			changed = true
+		}
+		if hoursChanged {
+			s.lcd.UpdateSecond(hours)
+			changed = true
+		}
+		if speedChanged {
+			s.lcd.UpdateSpeed(s.speed)
+			changed = true
+		}
+		if distanceChanged {
+			s.lcd.UpdateDistance(s.distance)
+		}
+		if changed {
+			s.lcd.UpdateDisplay()
+		}
 	}()
 }

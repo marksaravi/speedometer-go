@@ -25,17 +25,26 @@ func (d *dashboardDisplay) Initialise() {
 	d.initBackground()
 }
 
-func (d *dashboardDisplay) Update(data DisplayData) {
-	d.printSpeed(data.Speed, data.SpeedChanged)
-	d.printDistance(data.Distance, data.DistanceChanged)
-	if data.SecChanged {
-		d.printDurationDigits(data.Sec, SEC_CHANGED)
-	}
-	if data.MinChanged {
-		d.printDurationDigits(data.Min, MIN_CHANGED)
-	}
-	if data.HourChanged {
-		d.printDurationDigits(data.Hour, HOUR_CHANGED)
-	}
+func (d *dashboardDisplay) UpdateSpeed(speed float64) {
+	d.printSpeed(speed)
+}
+
+func (d *dashboardDisplay) UpdateDistance(distance float64) {
+	d.printDistance(distance)
+}
+
+func (d *dashboardDisplay) UpdateSecond(seconds int) {
+	d.printDurationDigits(seconds, SECOND_CHANGED)
+}
+
+func (d *dashboardDisplay) UpdateMinute(minutes int) {
+	d.printDurationDigits(minutes, MINUTE_CHANGED)
+}
+
+func (d *dashboardDisplay) UpdateHour(hours int) {
+	d.printDurationDigits(hours, HOUR_CHANGED)
+}
+
+func (d *dashboardDisplay) UpdateDisplay() {
 	d.display.Update()
 }

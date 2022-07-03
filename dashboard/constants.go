@@ -29,9 +29,9 @@ var (
 )
 
 const (
-	SEC_CHANGED  TimeChanged = 0
-	MIN_CHANGED  TimeChanged = 1
-	HOUR_CHANGED TimeChanged = 2
+	SECOND_CHANGED TimeChanged = 0
+	MINUTE_CHANGED TimeChanged = 1
+	HOUR_CHANGED   TimeChanged = 2
 )
 
 const (

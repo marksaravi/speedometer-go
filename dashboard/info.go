@@ -7,10 +7,7 @@ import (
 const DIGIT_WIDTH int = 36
 const COLON_WIDTH int = 14
 
-func (d *dashboardDisplay) printSpeed(speed float64, speedChanged bool) {
-	// if !speedChanged {
-	// 	return
-	// }
+func (d *dashboardDisplay) printSpeed(speed float64) {
 	d.speed = speed
 	d.setFont(
 		SPEED_DATA_FONT,
@@ -22,10 +19,7 @@ func (d *dashboardDisplay) printSpeed(speed float64, speedChanged bool) {
 	d.display.Write(fmt.Sprintf("%3.1f", d.speed))
 }
 
-func (d *dashboardDisplay) printDistance(distance float64, distanceChanged bool) {
-	if !distanceChanged {
-		return
-	}
+func (d *dashboardDisplay) printDistance(distance float64) {
 	d.distance = distance
 	x := LEFT_MARGIN + DATA_COLUMN
 	y := TOP_MARGIN + SPEED_LINE_HEIGHT
@@ -59,11 +53,11 @@ func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
 		drawDigit(t, x, y)
 	}
 	x += DIGIT_WIDTH + COLON_WIDTH
-	if change == MIN_CHANGED {
+	if change == MINUTE_CHANGED {
 		drawDigit(t, x, y)
 	}
 	x += DIGIT_WIDTH + COLON_WIDTH
-	if change == SEC_CHANGED {
+	if change == SECOND_CHANGED {
 		drawDigit(t, x, y)
 	}
 }

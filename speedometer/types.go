@@ -3,7 +3,6 @@ package speedometer
 import (
 	"time"
 
-	"github.com/marksaravi/speedometer-go/dashboard"
 	"periph.io/x/conn/v3/gpio"
 )
 
@@ -14,7 +13,12 @@ type Config struct {
 
 type lcdDisplay interface {
 	Initialise()
-	Update(dashboard.DisplayData)
+	UpdateSpeed(speed float64)
+	UpdateDistance(distance float64)
+	UpdateSecond(second int)
+	UpdateMinute(minute int)
+	UpdateHour(hour int)
+	UpdateDisplay()
 }
 
 type speedometerDev struct {
@@ -34,9 +38,7 @@ type speedometerDev struct {
 	resetLevel gpio.Level
 	resetTime  time.Time
 
-	sec      int
-	min      int
-	hour     int
+	dur      time.Duration
 	distance float64
 	speed    float64
 }
