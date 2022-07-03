@@ -31,14 +31,14 @@ type speedometerDev struct {
 	counter           int64
 	startTime         time.Time
 
-	pulse     gpio.Level
-	pulseTime time.Time
-	pulseDur  time.Duration
+	pulse gpio.Level
 
 	resetLevel gpio.Level
 	resetTime  time.Time
 
-	dur      time.Duration
-	distance float64
-	speed    float64
+	pulsePerSecond    int
+	pulseCountingTime time.Time
+	dur               time.Duration
+	distance          float64
+	speed             float64
 }
