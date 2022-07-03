@@ -30,8 +30,8 @@ func (d *dashboardDisplay) printDistance(distance float64) {
 		x,
 		y,
 	)
-	d.display.Write(fmt.Sprintf("%4.2f", (distance+100000)/1000))
-	d.display.ClearArea(float64(x), float64(y+2), float64(x+125), float64(y+DISTANCE_LINE_HEIGHT))
+	d.display.ClearArea(float64(x), float64(y+2), float64(x+110), float64(y+DISTANCE_LINE_HEIGHT))
+	d.display.Write(fmt.Sprintf("%4.2f", distance/1000))
 }
 
 func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
