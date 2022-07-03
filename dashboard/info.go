@@ -8,9 +8,9 @@ const DIGIT_WIDTH int = 36
 const COLON_WIDTH int = 14
 
 func (d *dashboardDisplay) printSpeed(speed float64, speedChanged bool) {
-	if !speedChanged {
-		return
-	}
+	// if !speedChanged {
+	// 	return
+	// }
 	d.speed = speed
 	d.setFont(
 		SPEED_DATA_FONT,
@@ -27,14 +27,17 @@ func (d *dashboardDisplay) printDistance(distance float64, distanceChanged bool)
 		return
 	}
 	d.distance = distance
+	x := LEFT_MARGIN + DATA_COLUMN
+	y := TOP_MARGIN + SPEED_LINE_HEIGHT
 	d.setFont(
 		DISTANCE_DATA_FONT,
 		d.theme.DistanceDataColor,
 		DISTANCE_LINE_HEIGHT,
-		LEFT_MARGIN+DATA_COLUMN,
-		TOP_MARGIN+SPEED_LINE_HEIGHT,
+		x,
+		y,
 	)
-	d.display.Write(fmt.Sprintf("%5.3f", distance/1000))
+	d.display.Write(fmt.Sprintf("%4.2f", (distance+100000)/1000))
+	d.display.ClearArea(float64(x), float64(y+2), float64(x+125), float64(y+DISTANCE_LINE_HEIGHT))
 }
 
 func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {

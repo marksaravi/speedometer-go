@@ -20,7 +20,7 @@ func NewSpeedometer() *speedometerDev {
 		lcd:   lcd,
 
 		distPerPulse:      config.DistancePerPulse,
-		sleepAfterPulseMS: 1,
+		sleepAfterPulseMS: config.SleepAfterPulseMS,
 
 		startTime:  time.Now(),
 		counter:    0,
@@ -54,7 +54,7 @@ func (s *speedometerDev) Run() {
 			s.update(speed, distance, changed)
 		}
 		if changed {
-			time.Sleep(time.Microsecond * 100)
+			time.Sleep(time.Microsecond * time.Duration(s.sleepAfterPulseMS))
 		}
 	}
 }
@@ -113,7 +113,7 @@ func (s *speedometerDev) getDurationChanges() (bool, bool, bool) {
 }
 
 func (s *speedometerDev) updateSpeed(speed float64) bool {
-	if math.Abs(speed-s.speed) >= dashboard.SPEED_RESOLUTION {
+	if math.Abs(speed-s.speed) >= MIN_SPEED_UPDATE {
 		s.speed = speed
 		return true
 	}
@@ -121,7 +121,7 @@ func (s *speedometerDev) updateSpeed(speed float64) bool {
 }
 
 func (s *speedometerDev) updateDistance(distance float64) bool {
-	if math.Abs(distance-s.distance) >= dashboard.DISTANCE_RESOLUTION {
+	if math.Abs(distance-s.distance) >= MIN_DISTANCE_UPDATE {
 		s.distance = distance
 		return true
 	}

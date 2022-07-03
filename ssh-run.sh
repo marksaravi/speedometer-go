@@ -11,9 +11,9 @@ copy_codes(){
 # copy_codes ./ config.json
 # copy_codes ./speedometer types.go
 # copy_codes ./speedometer initialise.go
-# copy_codes ./speedometer speedometer.go
+copy_codes ./speedometer speedometer.go
 # copy_codes ./cmd/speedometer main.go
-# copy_codes ./dashboard info.go
+copy_codes ./dashboard info.go
 # copy_codes ./dashboard types.go
 # copy_codes ./dashboard constants.go
 # copy_codes ./dashboard dashboard.go
