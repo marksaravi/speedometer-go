@@ -37,13 +37,21 @@ func NewSpeedometer() *speedometerDev {
 func (s *speedometerDev) Run() {
 	lastUpdate := time.Now()
 	s.speedPulseStartTime = time.Now().Add(-time.Second * 3600)
+	ts := time.Now()
+	var max time.Duration = 0
+
 	for {
+		if d := time.Since(ts); d > max {
+			max = d
+		}
+		ts = time.Now()
 		s.pulseCounter()
 		s.dur = time.Since(s.startTime)
 
 		if time.Since(lastUpdate) >= time.Millisecond*950 {
 			lastUpdate = time.Now()
-			fmt.Printf("%6.2f, %6.3f, %v\n", s.speed, s.distance, s.speedPulseDur)
+			fmt.Printf("%6.2f, %6.3f, %v, %d\n", s.speed, s.distance, s.speedPulseDur, max.Milliseconds())
+			max = 0
 			s.update()
 		}
 	}
@@ -56,8 +64,9 @@ func (s *speedometerDev) resetAll() {
 	s.resetLevel = gpio.Low
 }
 
-func (s *speedometerDev) pulseCounter() {
+func (s *speedometerDev) pulseCounter() bool {
 	pulse := s.input.Read()
+	isPulsed := false
 	if pulse != s.pulse {
 		if pulse == gpio.Low {
 			s.counter++
@@ -65,15 +74,17 @@ func (s *speedometerDev) pulseCounter() {
 				s.speedPulseStartTime = s.lastPulse
 			}
 			s.lastPulse = time.Now()
+			isPulsed = true
 		}
 		s.pulse = pulse
 	}
 	speedPulseDur := time.Since(s.speedPulseStartTime)
 	s.speed = s.distPerPulse / speedPulseDur.Seconds() * 3.6
-	if s.speed < 0.25 {
+	if s.speed < 0.3 {
 		s.speed = 0
 	}
 	s.distance = s.distPerPulse * float64(s.counter)
+	return isPulsed
 }
 
 func (s *speedometerDev) readReset() {
