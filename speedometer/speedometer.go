@@ -1,7 +1,6 @@
 package speedometer
 
 import (
-	"fmt"
 	"math"
 	"time"
 
@@ -32,27 +31,27 @@ func NewSpeedometer() *speedometerDev {
 		speed:    0,
 		distance: 0,
 		dur:      0,
+		changed:  false,
 	}
 	return &speedo
 }
 
 func (s *speedometerDev) Run() {
 	lastUpdate := time.Now()
-	loops := 0
 	for {
-		loops++
-		speed, distance, changed := s.readPulse()
-		s.readReset()
-
-		if time.Since(lastUpdate) >= time.Second {
-			lastUpdate = time.Now()
-			fmt.Println(s.counter, speed, distance, loops)
-			loops = 0
-			s.update(speed, distance, changed)
+		speed, distance, pulsed := s.readPulse()
+		if pulsed {
+			s.updateSpeed(speed)
+			s.updateDistance(distance)
 		}
-		if changed {
+		if time.Since(lastUpdate) >= time.Second {
+			s.updateDuration()
+			s.update()
+		}
+		if pulsed {
 			time.Sleep(time.Microsecond * time.Duration(s.sleepAfterPulseMS))
 		}
+		s.readReset()
 	}
 }
 
@@ -94,62 +93,44 @@ func (s *speedometerDev) readReset() {
 	}
 }
 
-func (s *speedometerDev) updateDuration() (int, int, int, bool, bool, bool) {
-	dur := time.Since(s.startTime)
-	seconds := int(dur.Seconds()) % 60
-	minutes := seconds / 60 % 60
-	hours := seconds / 3600
-
-	prevSeconds := int(s.dur.Seconds()) % 60
-	prevMinutes := prevSeconds / 60 % 60
-	prevHours := prevSeconds / 3600
-	s.dur = dur
-	return seconds, minutes, hours, seconds != prevSeconds, minutes != prevMinutes, hours != prevHours
+func getSecMinHour(d time.Duration) (int, int, int) {
+	seconds := int(d.Seconds()) % 60
+	return seconds, seconds / 60 % 60, seconds / 3600
 }
 
-func (s *speedometerDev) updateSpeed(speed float64) bool {
+func (s *speedometerDev) updateDuration() {
+	dur := time.Since(s.startTime)
+	seconds, minutes, hours := getSecMinHour(dur)
+	prevSeconds, prevMinutes, prevHours := getSecMinHour(s.dur)
+	s.dur = dur
+	s.changed = seconds != prevSeconds || minutes != prevMinutes || hours != prevHours
+}
+
+func (s *speedometerDev) updateSpeed(speed float64) {
 	if math.Abs(speed-s.speed) >= MIN_SPEED_UPDATE {
 		s.speed = speed
-		return true
+		s.changed = true
 	}
-	return false
 }
 
-func (s *speedometerDev) updateDistance(distance float64) bool {
+func (s *speedometerDev) updateDistance(distance float64) {
 	if math.Abs(distance-s.distance) >= MIN_DISTANCE_UPDATE {
 		s.distance = distance
-		return true
+		s.changed = true
 	}
-	return false
 }
 
-func (s *speedometerDev) update(speed, distance float64, changed bool) {
-	seconds, minutes, hours, secondsChanged, minutesChanged, hoursChanged := s.updateDuration()
-	speedChanged := s.updateSpeed(speed)
-	distanceChanged := s.updateDistance(distance)
+func (s *speedometerDev) update() {
 	func() {
-		changed := false
-		if secondsChanged {
+		if s.changed {
+			seconds, minutes, hours := getSecMinHour(s.dur)
 			s.lcd.UpdateSecond(seconds)
-			changed = true
-		}
-		if minutesChanged {
 			s.lcd.UpdateSecond(minutes)
-			changed = true
-		}
-		if hoursChanged {
 			s.lcd.UpdateSecond(hours)
-			changed = true
-		}
-		if speedChanged {
 			s.lcd.UpdateSpeed(s.speed)
-			changed = true
-		}
-		if distanceChanged {
 			s.lcd.UpdateDistance(s.distance)
-		}
-		if changed {
 			s.lcd.UpdateDisplay()
+			s.changed = false
 		}
 	}()
 }
