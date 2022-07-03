@@ -9,6 +9,8 @@ const COLON_WIDTH int = 14
 
 func (d *dashboardDisplay) printSpeed(speed float64) {
 	d.speed = speed
+	x := LEFT_MARGIN + DATA_COLUMN
+	y := TOP_MARGIN
 	d.setFont(
 		SPEED_DATA_FONT,
 		d.theme.SpeedDataColor,
@@ -16,6 +18,7 @@ func (d *dashboardDisplay) printSpeed(speed float64) {
 		LEFT_MARGIN+DATA_COLUMN,
 		TOP_MARGIN,
 	)
+	d.display.ClearArea(float64(x), float64(y), float64(x+115), float64(y+SPEED_LINE_HEIGHT+2))
 	d.display.Write(fmt.Sprintf("%3.1f", d.speed))
 }
 
