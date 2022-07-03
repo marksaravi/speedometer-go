@@ -1,7 +1,6 @@
 package speedometer
 
 import (
-	"fmt"
 	"time"
 
 	"periph.io/x/conn/v3/gpio"
@@ -49,7 +48,7 @@ func (s *speedometerDev) Run() {
 		if time.Since(lastUpdate) >= time.Millisecond*950 {
 			s.updateSpeedDistanceDuration()
 			lastUpdate = time.Now()
-			fmt.Printf("%3d, %6.2f, %6.3f, %3d, %2d\n", s.counter, s.speed, s.distance, max.Milliseconds(), len(s.speedPulses))
+			// fmt.Printf("%3d, %6.2f, %6.3f, %3d, %2d\n", s.counter, s.speed, s.distance, max.Milliseconds(), len(s.speedPulses))
 			max = 0
 			s.update()
 		}
@@ -129,8 +128,8 @@ func (s *speedometerDev) readReset() {
 }
 
 func getSecMinHour(d time.Duration) (int, int, int) {
-	seconds := int(d.Seconds()) % 60
-	return seconds, seconds / 60 % 60, seconds / 3600
+	seconds := int(d.Seconds())
+	return seconds % 60, seconds / 60 % 60, seconds / 3600
 }
 
 func (s *speedometerDev) update() {
