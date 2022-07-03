@@ -1,4 +1,4 @@
-package main
+package speedometer
 
 import (
 	"fmt"
@@ -9,44 +9,19 @@ import (
 	"periph.io/x/conn/v3/gpio"
 )
 
-type Config struct {
-	DistancePerPulse float64 `json:"distance-per-pulse"`
-}
-
-type lcdDisplay interface {
-	Initialise()
-	Update(dashboard.DisplayData)
-}
-
-type speedometer struct {
-	counter   int64
-	startTime time.Time
-
-	pulse     gpio.Level
-	pulseTime time.Time
-	pulseDur  time.Duration
-
-	resetLevel gpio.Level
-	resetTime  time.Time
-
-	distPerPulse float64
-	sec          int
-	min          int
-	hour         int
-	distance     float64
-	speed        float64
-
-	input gpio.PinIn
-	reset gpio.PinIn
-	lcd   lcdDisplay
-}
-
-func main() {
+func NewSpeedometer() *speedometerDev {
 	config := ReadConfigs()
 	lcd := createDisplay()
 	lcd.Initialise()
 
-	speedo := speedometer{
+	speedo := speedometerDev{
+		input: createGpioInputPin("GPIO14"),
+		reset: createGpioInputPin("GPIO15"),
+		lcd:   lcd,
+
+		distPerPulse:      config.DistancePerPulse,
+		sleepAfterPulseMS: 1,
+
 		startTime:  time.Now(),
 		counter:    0,
 		pulse:      gpio.Low,
@@ -55,36 +30,36 @@ func main() {
 		resetLevel: gpio.Low,
 		resetTime:  time.Now(),
 
-		distPerPulse: config.DistancePerPulse,
-		speed:        0,
-		distance:     0,
-		sec:          0,
-		min:          0,
-		hour:         0,
-
-		input: createGpioInputPin("GPIO14"),
-		reset: createGpioInputPin("GPIO15"),
-		lcd:   lcd,
+		speed:    0,
+		distance: 0,
+		sec:      0,
+		min:      0,
+		hour:     0,
 	}
-	speedo.process()
+	return &speedo
 }
 
-func (s *speedometer) process() {
+func (s *speedometerDev) Run() {
 	lastUpdate := time.Now()
+	loops := 0
 	for {
+		loops++
 		speed, distance, changed := s.readPulse()
 		s.readReset()
-		time.Sleep(time.Millisecond)
+
 		if time.Since(lastUpdate) >= time.Second {
 			lastUpdate = time.Now()
-			fmt.Println(s.counter, speed, distance)
+			fmt.Println(s.counter, speed, distance, loops)
+			loops = 0
 			s.update(speed, distance, changed)
 		}
-
+		if changed {
+			time.Sleep(time.Microsecond * 100)
+		}
 	}
 }
 
-func (s *speedometer) resetAll() {
+func (s *speedometerDev) resetAll() {
 	s.counter = 0
 	s.startTime = time.Now()
 	s.pulseTime = time.Now()
@@ -92,7 +67,7 @@ func (s *speedometer) resetAll() {
 	s.resetLevel = gpio.Low
 }
 
-func (s *speedometer) readPulse() (float64, float64, bool) {
+func (s *speedometerDev) readPulse() (float64, float64, bool) {
 	pulse := s.input.Read()
 	var speed float64 = 0
 	changed := false
@@ -110,7 +85,7 @@ func (s *speedometer) readPulse() (float64, float64, bool) {
 	return speed, distance, changed
 }
 
-func (s *speedometer) readReset() {
+func (s *speedometerDev) readReset() {
 	reset := s.reset.Read()
 	if reset == gpio.Low {
 		s.resetTime = time.Now()
@@ -122,7 +97,7 @@ func (s *speedometer) readReset() {
 	}
 }
 
-func (s *speedometer) getDurationChanges() (bool, bool, bool) {
+func (s *speedometerDev) getDurationChanges() (bool, bool, bool) {
 	dur := time.Since(s.startTime)
 	sec := int(dur.Seconds()) % 60
 	min := sec / 60 % 60
@@ -137,7 +112,7 @@ func (s *speedometer) getDurationChanges() (bool, bool, bool) {
 	return secChanged, minChanged, hourChanged
 }
 
-func (s *speedometer) updateSpeed(speed float64) bool {
+func (s *speedometerDev) updateSpeed(speed float64) bool {
 	if math.Abs(speed-s.speed) >= dashboard.SPEED_RESOLUTION {
 		s.speed = speed
 		return true
@@ -145,7 +120,7 @@ func (s *speedometer) updateSpeed(speed float64) bool {
 	return false
 }
 
-func (s *speedometer) updateDistance(distance float64) bool {
+func (s *speedometerDev) updateDistance(distance float64) bool {
 	if math.Abs(distance-s.distance) >= dashboard.DISTANCE_RESOLUTION {
 		s.distance = distance
 		return true
@@ -153,7 +128,7 @@ func (s *speedometer) updateDistance(distance float64) bool {
 	return false
 }
 
-func (s *speedometer) update(speed, distance float64, changed bool) {
+func (s *speedometerDev) update(speed, distance float64, changed bool) {
 	secChanged, minChanged, hourChanged := s.getDurationChanges()
 	speedChanged := s.updateSpeed(speed)
 	distanceChanged := s.updateDistance(distance)
