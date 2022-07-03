@@ -1,7 +1,6 @@
 package speedometer
 
 import (
-	"math"
 	"time"
 
 	"periph.io/x/conn/v3/gpio"
@@ -31,7 +30,6 @@ func NewSpeedometer() *speedometerDev {
 		speed:    0,
 		distance: 0,
 		dur:      0,
-		changed:  false,
 	}
 	return &speedo
 }
@@ -40,16 +38,17 @@ func (s *speedometerDev) Run() {
 	lastUpdate := time.Now()
 	for {
 		speed, distance, pulsed := s.readPulse()
+		s.dur = time.Since(s.startTime)
 		if pulsed {
-			s.updateSpeed(speed)
-			s.updateDistance(distance)
+			s.speed = speed
+			s.distance = distance
 		}
-		if time.Since(lastUpdate) >= time.Second {
-			s.updateDuration()
+		if time.Since(lastUpdate) >= time.Millisecond*900 {
 			s.update()
-		}
-		if pulsed {
-			time.Sleep(time.Microsecond * time.Duration(s.sleepAfterPulseMS))
+			lastUpdate = time.Now()
+			if pulsed {
+				time.Sleep(time.Microsecond * time.Duration(s.sleepAfterPulseMS))
+			}
 		}
 		s.readReset()
 	}
@@ -98,39 +97,14 @@ func getSecMinHour(d time.Duration) (int, int, int) {
 	return seconds, seconds / 60 % 60, seconds / 3600
 }
 
-func (s *speedometerDev) updateDuration() {
-	dur := time.Since(s.startTime)
-	seconds, minutes, hours := getSecMinHour(dur)
-	prevSeconds, prevMinutes, prevHours := getSecMinHour(s.dur)
-	s.dur = dur
-	s.changed = seconds != prevSeconds || minutes != prevMinutes || hours != prevHours
-}
-
-func (s *speedometerDev) updateSpeed(speed float64) {
-	if math.Abs(speed-s.speed) >= MIN_SPEED_UPDATE {
-		s.speed = speed
-		s.changed = true
-	}
-}
-
-func (s *speedometerDev) updateDistance(distance float64) {
-	if math.Abs(distance-s.distance) >= MIN_DISTANCE_UPDATE {
-		s.distance = distance
-		s.changed = true
-	}
-}
-
 func (s *speedometerDev) update() {
+	seconds, minutes, hours := getSecMinHour(s.dur)
+	s.lcd.UpdateSecond(seconds)
+	s.lcd.UpdateMinute(minutes)
+	s.lcd.UpdateHour(hours)
+	s.lcd.UpdateSpeed(s.speed)
+	s.lcd.UpdateDistance(s.distance)
 	func() {
-		if s.changed {
-			seconds, minutes, hours := getSecMinHour(s.dur)
-			s.lcd.UpdateSecond(seconds)
-			s.lcd.UpdateSecond(minutes)
-			s.lcd.UpdateSecond(hours)
-			s.lcd.UpdateSpeed(s.speed)
-			s.lcd.UpdateDistance(s.distance)
-			s.lcd.UpdateDisplay()
-			s.changed = false
-		}
+		s.lcd.UpdateDisplay()
 	}()
 }

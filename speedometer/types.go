@@ -41,5 +41,4 @@ type speedometerDev struct {
 	dur      time.Duration
 	distance float64
 	speed    float64
-	changed  bool
 }
