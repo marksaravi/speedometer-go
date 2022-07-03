@@ -49,7 +49,7 @@ func (s *speedometerDev) Run() {
 		if time.Since(lastUpdate) >= time.Millisecond*950 {
 			s.updateSpeedDistanceDuration()
 			lastUpdate = time.Now()
-			fmt.Printf("%3d, %6.2f, %6.3f, %3d, %2d\n", s.counter, s.speed, s.distance, max.Milliseconds(), len(s.speedPulses))
+			fmt.Printf("%3d, %6.2f, %6.3f, %3d, %2d, %f\n", s.counter, s.speed, s.distance, max.Milliseconds(), len(s.speedPulses), millichange)
 			max = 0
 			s.update()
 		}
@@ -64,17 +64,26 @@ func (s *speedometerDev) resetAll() {
 }
 
 var tpulse = time.Now()
+var inc float64 = -0.01
+var millichange float64 = 5
 
 func (s *speedometerDev) pulseFaker() gpio.Level {
-	const MILLISECONDS = 32
+	var MILLISECONDS float64 = 64 + millichange
+	millichange += inc
+	if millichange > 5 {
+		inc = -0.01
+	}
+	if millichange < -5 {
+		inc = 0.01
+	}
 	pulse := s.pulse
 
-	if s.pulse == gpio.Low && time.Since(tpulse) >= time.Millisecond*MILLISECONDS {
+	if s.pulse == gpio.Low && time.Since(tpulse) >= time.Millisecond*time.Duration(MILLISECONDS) {
 		pulse = gpio.High
 		tpulse = time.Now()
 	}
 
-	if s.pulse == gpio.High && time.Since(tpulse) >= time.Millisecond*MILLISECONDS/8 {
+	if s.pulse == gpio.High && time.Since(tpulse) >= time.Millisecond*time.Duration(MILLISECONDS/8) {
 		pulse = gpio.Low
 		tpulse = time.Now()
 	}
@@ -82,8 +91,8 @@ func (s *speedometerDev) pulseFaker() gpio.Level {
 }
 
 func (s *speedometerDev) pulseCounter() bool {
-	pulse := s.input.Read()
-	// pulse := s.pulseFaker()
+	// pulse := s.input.Read()
+	pulse := s.pulseFaker()
 	isPulsed := false
 
 	if pulse != s.pulse {
@@ -135,13 +144,13 @@ func getSecMinHour(d time.Duration) (int, int, int) {
 }
 
 func (s *speedometerDev) update() {
-	seconds, minutes, hours := getSecMinHour(s.dur)
+	seconds, _, _ := getSecMinHour(s.dur)
 	s.lcd.UpdateSecond(seconds)
-	s.lcd.UpdateMinute(minutes)
-	s.lcd.UpdateHour(hours)
-	s.lcd.UpdateSpeed(s.speed)
-	s.lcd.UpdateDistance(s.distance)
+	// s.lcd.UpdateMinute(minutes)
+	// s.lcd.UpdateHour(hours)
+	// s.lcd.UpdateSpeed(s.speed)
+	// s.lcd.UpdateDistance(s.distance)
 	func() {
-		// s.lcd.UpdateDisplay()
+		s.lcd.UpdateDisplay()
 	}()
 }

@@ -18,8 +18,10 @@ func (d *dashboardDisplay) printSpeed(speed float64) {
 		LEFT_MARGIN+DATA_COLUMN,
 		TOP_MARGIN,
 	)
-	d.display.ClearArea(float64(x), float64(y), float64(x+115), float64(y+SPEED_LINE_HEIGHT+2))
+	d.display.ClearArea(float64(x), float64(y+30), float64(x+115), float64(y+SPEED_LINE_HEIGHT+2))
 	d.display.Write(fmt.Sprintf("%3.1f", d.speed))
+	// d.display.SetColor(colors.RED)
+	// d.display.Rectangle(float64(x), float64(y+30), float64(x+115), float64(y+SPEED_LINE_HEIGHT+2))
 }
 
 func (d *dashboardDisplay) printDistance(distance float64) {
@@ -33,15 +35,19 @@ func (d *dashboardDisplay) printDistance(distance float64) {
 		x,
 		y,
 	)
-	d.display.ClearArea(float64(x), float64(y+2), float64(x+110), float64(y+DISTANCE_LINE_HEIGHT))
+	d.display.ClearArea(float64(x), float64(y+38), float64(x+110), float64(y+DISTANCE_LINE_HEIGHT))
 	d.display.Write(fmt.Sprintf("%4.2f", distance/1000))
+	// d.display.SetColor(colors.RED)
+	// d.display.Rectangle(float64(x), float64(y+38), float64(x+110), float64(y+DISTANCE_LINE_HEIGHT))
 }
 
 func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
 	drawDigit := func(t, x, y int) {
-		d.display.ClearArea(float64(x), float64(y), float64(x+DIGIT_WIDTH), float64(y+DURATION_LINE_HEIGHT))
+		d.display.ClearArea(float64(x), float64(y+40), float64(x+DIGIT_WIDTH), float64(y+DURATION_LINE_HEIGHT))
 		d.display.MoveCursor(x, y)
 		d.display.Write(fmt.Sprintf("%02d", t))
+		// d.display.SetColor(colors.RED)
+		// d.display.Rectangle(float64(x), float64(y+40), float64(x+DIGIT_WIDTH), float64(y+DURATION_LINE_HEIGHT))
 	}
 	x := LEFT_MARGIN + DATA_COLUMN
 	y := TOP_MARGIN + SPEED_LINE_HEIGHT + DISTANCE_LINE_HEIGHT
