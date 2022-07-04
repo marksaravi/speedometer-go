@@ -1,6 +1,7 @@
 package speedometer
 
 import (
+	"fmt"
 	"time"
 
 	"periph.io/x/conn/v3/gpio"
@@ -35,21 +36,43 @@ func NewSpeedometer() *speedometerDev {
 
 func (s *speedometerDev) Run() {
 	lastUpdate := time.Now()
-	ts := time.Now()
-	var max time.Duration = 0
+	// ts := time.Now()
+	// var max time.Duration = 0
 	s.speedPulses = append(s.speedPulses, time.Now().Add(-time.Second*86400))
-	for {
-		if d := time.Since(ts); d > max {
-			max = d
+	pulseChannel := make(chan time.Time)
+	go func() {
+		prevLevel := gpio.Low
+		for {
+			time.Sleep(time.Millisecond)
+			level := s.input.Read()
+			if prevLevel != level && level == gpio.Low {
+				pulseChannel <- time.Now()
+			}
+			prevLevel = level
 		}
-		ts = time.Now()
-		s.pulseCounter()
+	}()
+	for {
+		select {
+		case pulseTime := <-pulseChannel:
+			s.counter++
+			if len(s.speedPulses) == 2 {
+				s.speedPulses = s.speedPulses[1:]
+			}
+			s.speedPulses = append(s.speedPulses, pulseTime)
+
+		default:
+		}
+		// if d := time.Since(ts); d > max {
+		// 	max = d
+		// }
+		// ts = time.Now()
+		// s.pulseCounter()
 
 		if time.Since(lastUpdate) >= time.Millisecond*950 {
 			s.updateSpeedDistanceDuration()
 			lastUpdate = time.Now()
-			// fmt.Printf("%3d, %6.2f, %6.3f, %3d, %2d\n", s.counter, s.speed, s.distance, max.Milliseconds(), len(s.speedPulses))
-			max = 0
+			fmt.Printf("%3d, %6.2f, %6.3f, %2d\n", s.counter, s.speed, s.distance, len(s.speedPulses))
+			// max = 0
 			s.update()
 		}
 	}
