@@ -21,7 +21,6 @@ func (d *dashboardDisplay) initBackground() {
 func (d *dashboardDisplay) setFont(font fonts.BitmapFont, color colors.Color, lineHeight int, x, y int) {
 	d.display.SetColor(color)
 	d.display.SetFont(font)
-	d.display.SetLineHeight(lineHeight)
 	d.display.MoveCursor(x, y)
 }
 
