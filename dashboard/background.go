@@ -19,52 +19,54 @@ func (d *dashboardDisplay) initBackground() {
 	d.display.Update()
 }
 
-func (d *dashboardDisplay) setFont(font fonts.BitmapFont, color colors.Color, x, y int) {
+func (d *dashboardDisplay) writeText(text string, font fonts.BitmapFont, color colors.Color, x, y int) {
 	d.display.SetColor(color)
 	d.display.SetFont(font)
 	d.display.MoveCursor(x, y)
+	d.display.Write(text)
 }
 
 func (d *dashboardDisplay) printLabels() {
-	d.setFont(
+	d.writeText(
+		"Speed (km/h):",
 		SPEED_LABEL_FONT,
 		d.theme.SpeedLabelColor,
 		LEFT_MARGIN+LABEL_COLUMN,
 		SPEED_LABEL_LINE_Y,
 	)
-	d.display.Write("Speed (km/h):")
-	d.setFont(
+	d.writeText(
+		"Distance (km):",
 		DISTANCE_LABEL_FONT,
 		d.theme.DistanceLabelColor,
 		LEFT_MARGIN+LABEL_COLUMN,
 		DISTANCE_LABEL_LINE_Y,
 	)
-	d.display.Write("Distance (km):")
-	d.setFont(
+	d.writeText(
+		"Duration:",
 		DURATION_LABEL_FONT,
 		d.theme.DurationLabelColor,
 		LEFT_MARGIN+LABEL_COLUMN,
 		DURATION_LABEL_LINE_Y,
 	)
-	d.display.Write("Duration:")
 }
 
 func (d *dashboardDisplay) printDurationColons() {
-	drawDigit := func(x, y int) {
-		d.display.MoveCursor(x+DIGIT_WIDTH+4, y)
-		d.display.Write(":")
-	}
-	x := LEFT_MARGIN + DATA_COLUMN
+	x := LEFT_MARGIN + DATA_COLUMN + DIGIT_WIDTH + 4
 	y := DURATION_DATA_LINE_Y
-	d.setFont(
+	d.writeText(
+		":",
 		DURATION_DATA_FONT,
 		d.theme.DurationDataColor,
 		x,
 		y,
 	)
-	drawDigit(x, y)
-	x += DIGIT_WIDTH + COLON_WIDTH
-	drawDigit(x, y)
+	d.writeText(
+		":",
+		DURATION_DATA_FONT,
+		d.theme.DurationDataColor,
+		x+DIGIT_WIDTH+COLON_WIDTH,
+		y,
+	)
 }
 
 func (d *dashboardDisplay) drawGrids() {

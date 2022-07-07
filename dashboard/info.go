@@ -18,12 +18,12 @@ func (d *dashboardDisplay) printSpeed(speed float64) {
 	d.speed = speed
 	x := LEFT_MARGIN + DATA_COLUMN
 	y := SPEED_DATA_LINE_Y
-	d.setFont(
-		SPEED_DATA_FONT,
-		d.theme.SpeedDataColor,
-		0,
-		0,
-	)
+	// d.setFont(
+	// 	SPEED_DATA_FONT,
+	// 	d.theme.SpeedDataColor,
+	// 	0,
+	// 	0,
+	// )
 	d.printDigits(fmt.Sprintf("%3.1f", d.speed), x, y)
 }
 
@@ -31,12 +31,12 @@ func (d *dashboardDisplay) printDistance(distance float64) {
 	d.distance = distance
 	x := LEFT_MARGIN + DATA_COLUMN
 	y := DISTANCE_DATA_LINE_Y
-	d.setFont(
-		DISTANCE_DATA_FONT,
-		d.theme.DistanceDataColor,
-		0,
-		0,
-	)
+	// d.setFont(
+	// 	DISTANCE_DATA_FONT,
+	// 	d.theme.DistanceDataColor,
+	// 	0,
+	// 	0,
+	// )
 	d.printDigits(fmt.Sprintf("%4.2f", distance/1000), x, y)
 }
 
@@ -47,12 +47,12 @@ func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
 
 	x := LEFT_MARGIN + DATA_COLUMN
 	y := DURATION_DATA_LINE_Y
-	d.setFont(
-		DURATION_DATA_FONT,
-		d.theme.DurationDataColor,
-		x,
-		y,
-	)
+	// d.setFont(
+	// 	DURATION_DATA_FONT,
+	// 	d.theme.DurationDataColor,
+	// 	x,
+	// 	y,
+	// )
 	if change == HOUR_CHANGED {
 		drawDigit(t, x, y)
 	}
