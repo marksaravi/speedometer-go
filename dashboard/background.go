@@ -19,10 +19,14 @@ func (d *dashboardDisplay) initBackground() {
 	d.display.Update()
 }
 
-func (d *dashboardDisplay) writeText(text string, font fonts.BitmapFont, color colors.Color, x, y int) {
+func (d *dashboardDisplay) setTextSettings(font fonts.BitmapFont, color colors.Color, x, y int) {
 	d.display.SetColor(color)
 	d.display.SetFont(font)
 	d.display.MoveCursor(x, y)
+}
+
+func (d *dashboardDisplay) writeText(text string, font fonts.BitmapFont, color colors.Color, x, y int) {
+	d.setTextSettings(font, color, x, y)
 	d.display.Write(text)
 }
 
