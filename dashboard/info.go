@@ -14,7 +14,7 @@ func (d *dashboardDisplay) printDigits(digits string, font fonts.BitmapFont, col
 	d.display.Write(digits)
 }
 
-func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
+func (d *dashboardDisplay) printDurationDigits(t int, change int) {
 	digits := fmt.Sprintf("%02d", t)
 	x := DATA_X
 	y := DURATION_DATA_LINE_Y

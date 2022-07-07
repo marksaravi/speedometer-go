@@ -15,9 +15,7 @@ type lcdDisplay interface {
 	Initialise()
 	UpdateSpeed(speed float64)
 	UpdateDistance(distance float64)
-	UpdateSecond(second int)
-	UpdateMinute(minute int)
-	UpdateHour(hour int)
+	UpdateDuration(dur, timeType int)
 	UpdateDisplay()
 }
 

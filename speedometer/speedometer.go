@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/marksaravi/speedometer-go/dashboard"
 	"periph.io/x/conn/v3/gpio"
 )
 
@@ -157,9 +158,9 @@ func getSecMinHour(d time.Duration) (int, int, int) {
 
 func (s *speedometerDev) update() {
 	seconds, minutes, hours := getSecMinHour(s.dur)
-	s.lcd.UpdateSecond(seconds)
-	s.lcd.UpdateMinute(minutes)
-	s.lcd.UpdateHour(hours)
+	s.lcd.UpdateDuration(seconds, dashboard.SECOND_CHANGED)
+	s.lcd.UpdateDuration(minutes, dashboard.MINUTE_CHANGED)
+	s.lcd.UpdateDuration(hours, dashboard.HOUR_CHANGED)
 	s.lcd.UpdateSpeed(s.speed)
 	s.lcd.UpdateDistance(s.distance)
 	func() {

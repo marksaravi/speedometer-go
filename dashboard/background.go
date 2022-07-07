@@ -12,9 +12,9 @@ func (d *dashboardDisplay) initBackground() {
 	d.UpdateSpeed(0)
 	d.UpdateDistance(0)
 	d.printDurationColons()
-	d.printDurationDigits(0, SECOND_CHANGED)
-	d.printDurationDigits(0, MINUTE_CHANGED)
-	d.printDurationDigits(0, HOUR_CHANGED)
+	d.UpdateDuration(0, SECOND_CHANGED)
+	d.UpdateDuration(0, MINUTE_CHANGED)
+	d.UpdateDuration(0, HOUR_CHANGED)
 	d.drawGrids()
 	d.display.Update()
 }
