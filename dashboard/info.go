@@ -41,14 +41,15 @@ func (d *dashboardDisplay) printDistance(distance float64) {
 
 func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
 	drawDigit := func(t, x, y int) {
-		d.display.ClearArea(float64(x), float64(y+40), float64(x+DIGIT_WIDTH), float64(y+DURATION_LABEL_LINE_Y))
+		digits := fmt.Sprintf("%02d", t)
+		x1, y1, x2, y2 := d.display.GetTextArea(digits)
+		d.display.ClearArea(float64(x+x1), float64(y+y1), float64(x+x2), float64(y+y2))
 		d.display.MoveCursor(x, y)
-		d.display.Write(fmt.Sprintf("%02d", t))
-		// d.display.SetColor(colors.RED)
-		// d.display.Rectangle(float64(x), float64(y+40), float64(x+DIGIT_WIDTH), float64(y+DURATION_LABEL_LINE_Y))
+		d.display.Write(digits)
 	}
+
 	x := LEFT_MARGIN + DATA_COLUMN
-	y := SPEED_LABEL_LINE_Y + DISTANCE_LABEL_LINE_Y
+	y := DURATION_DATA_LINE_Y
 	d.setFont(
 		DURATION_DATA_FONT,
 		d.theme.DurationDataColor,

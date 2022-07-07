@@ -55,7 +55,7 @@ func (d *dashboardDisplay) printDurationColons() {
 		d.display.Write(":")
 	}
 	x := LEFT_MARGIN + DATA_COLUMN
-	y := SPEED_LABEL_LINE_Y + DISTANCE_LABEL_LINE_Y
+	y := DURATION_DATA_LINE_Y
 	d.setFont(
 		DURATION_DATA_FONT,
 		d.theme.DurationDataColor,
