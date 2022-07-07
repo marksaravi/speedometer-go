@@ -9,7 +9,6 @@ import (
 const (
 	SEG_HEIGHT            int = 24
 	SEG_WIDTH             int = 32
-	LOWER_MARGIN_DATA     int = 8
 	LABEL_X               int = 16
 	LABEL_GAP_M           int = 2 * SEG_HEIGHT
 	SPEED_LABEL_LINE_Y    int = 4*SEG_HEIGHT - 12
