@@ -156,13 +156,13 @@ func getSecMinHour(d time.Duration) (int, int, int) {
 }
 
 func (s *speedometerDev) update() {
-	seconds, minutes, hours := getSecMinHour(s.dur)
-	s.lcd.UpdateSecond(seconds)
-	s.lcd.UpdateMinute(minutes)
-	s.lcd.UpdateHour(hours)
-	s.lcd.UpdateSpeed(s.speed)
-	s.lcd.UpdateDistance(s.distance)
-	func() {
-		s.lcd.UpdateDisplay()
-	}()
+	// seconds, minutes, hours := getSecMinHour(s.dur)
+	// s.lcd.UpdateSecond(seconds)
+	// s.lcd.UpdateMinute(minutes)
+	// s.lcd.UpdateHour(hours)
+	// s.lcd.UpdateSpeed(s.speed)
+	// s.lcd.UpdateDistance(s.distance)
+	// func() {
+	// 	s.lcd.UpdateDisplay()
+	// }()
 }

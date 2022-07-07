@@ -7,13 +7,14 @@ import (
 
 // basic dimensions
 const (
-	TOP_MARGIN           int = 0
-	LEFT_MARGIN          int = 16
-	SPEED_LINE_HEIGHT    int = 64
-	DISTANCE_LINE_HEIGHT int = 64
-	DURATION_LINE_HEIGHT int = 64
-	LABEL_COLUMN         int = 0
-	DATA_COLUMN          int = 120
+	SEG_HEIGHT            int = 24
+	LOWER_MARGIN_1        int = 12
+	LEFT_MARGIN           int = 16
+	SPEED_LABEL_LINE_Y    int = 4*SEG_HEIGHT - LOWER_MARGIN_1
+	DISTANCE_LABEL_LINE_Y int = 6*SEG_HEIGHT - LOWER_MARGIN_1
+	DURATION_LABEL_LINE_Y int = 8*SEG_HEIGHT - LOWER_MARGIN_1
+	LABEL_COLUMN          int = 0
+	DATA_COLUMN           int = 120
 )
 
 // Fonts
