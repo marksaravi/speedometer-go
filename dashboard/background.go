@@ -35,21 +35,21 @@ func (d *dashboardDisplay) printLabels() {
 		"Speed (km/h):",
 		SPEED_LABEL_FONT,
 		d.theme.SpeedLabelColor,
-		LEFT_MARGIN+LABEL_COLUMN,
+		LABEL_COLUMN,
 		SPEED_LABEL_LINE_Y,
 	)
 	d.writeText(
 		"Distance (km):",
 		DISTANCE_LABEL_FONT,
 		d.theme.DistanceLabelColor,
-		LEFT_MARGIN+LABEL_COLUMN,
+		LABEL_COLUMN,
 		DISTANCE_LABEL_LINE_Y,
 	)
 	d.writeText(
 		"Duration:",
 		DURATION_LABEL_FONT,
 		d.theme.DurationLabelColor,
-		LEFT_MARGIN+LABEL_COLUMN,
+		LABEL_COLUMN,
 		DURATION_LABEL_LINE_Y,
 	)
 }

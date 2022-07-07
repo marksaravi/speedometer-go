@@ -16,21 +16,21 @@ func (d *dashboardDisplay) printDigits(digits string, font fonts.BitmapFont, col
 
 func (d *dashboardDisplay) printSpeed(speed float64) {
 	d.speed = speed
-	x := LEFT_MARGIN + DATA_COLUMN
+	x := DATA_X
 	y := SPEED_DATA_LINE_Y
 	d.printDigits(fmt.Sprintf("%3.1f", d.speed), SPEED_DATA_FONT, d.theme.SpeedDataColor, x, y)
 }
 
 func (d *dashboardDisplay) printDistance(distance float64) {
 	d.distance = distance
-	x := LEFT_MARGIN + DATA_COLUMN
+	x := DATA_X
 	y := DISTANCE_DATA_LINE_Y
 	d.printDigits(fmt.Sprintf("%4.2f", distance/1000), DISTANCE_DATA_FONT, d.theme.DistanceDataColor, x, y)
 }
 
 func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
 	digits := fmt.Sprintf("%02d", t)
-	x := LEFT_MARGIN + TIME_DATA_COLUMN
+	x := LABEL_X + TIME_DATA_COLUMN
 	y := DURATION_DATA_LINE_Y
 	DIGIT_OFFSET := TIME_DIGIT_WIDTH + TIME_COLON_WIDTH
 	if change == MINUTE_CHANGED {
@@ -43,7 +43,7 @@ func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
 }
 
 func (d *dashboardDisplay) printDurationColons() {
-	x := LEFT_MARGIN + TIME_DATA_COLUMN + TIME_DIGIT_WIDTH + TIME_COLON_OFFSET
+	x := LABEL_X + TIME_DATA_COLUMN + TIME_DIGIT_WIDTH + TIME_COLON_OFFSET
 	y := DURATION_DATA_LINE_Y
 	d.writeText(
 		":",
