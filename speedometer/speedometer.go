@@ -160,9 +160,9 @@ func (s *speedometerDev) update() {
 	s.lcd.UpdateSecond(seconds)
 	s.lcd.UpdateMinute(minutes)
 	s.lcd.UpdateHour(hours)
-	// s.lcd.UpdateSpeed(s.speed)
-	// s.lcd.UpdateDistance(s.distance)
-	// func() {
-	// 	s.lcd.UpdateDisplay()
-	// }()
+	s.lcd.UpdateSpeed(s.speed)
+	s.lcd.UpdateDistance(s.distance)
+	func() {
+		s.lcd.UpdateDisplay()
+	}()
 }

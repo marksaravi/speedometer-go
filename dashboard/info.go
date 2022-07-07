@@ -35,8 +35,6 @@ func (d *dashboardDisplay) printDistance(distance float64) {
 	)
 	d.display.ClearArea(float64(x), float64(y+38), float64(x+110), float64(y+DISTANCE_LABEL_LINE_Y))
 	d.display.Write(fmt.Sprintf("%4.2f", distance/1000))
-	// d.display.SetColor(colors.RED)
-	// d.display.Rectangle(float64(x), float64(y+38), float64(x+110), float64(y+DISTANCE_LABEL_LINE_Y))
 }
 
 func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {

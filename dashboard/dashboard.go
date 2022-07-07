@@ -37,7 +37,7 @@ func (d *dashboardDisplay) Initialise() {
 func (d *dashboardDisplay) UpdateSpeed(speed float64) {
 	if math.Abs(speed-d.speed) > 0.25 {
 		d.printSpeed(speed)
-		d.speed = speed
+		d.speed = -1
 	}
 
 }
@@ -45,7 +45,7 @@ func (d *dashboardDisplay) UpdateSpeed(speed float64) {
 func (d *dashboardDisplay) UpdateDistance(distance float64) {
 	if distance != d.distance {
 		d.printDistance(distance)
-		d.distance = distance
+		d.distance = -1
 	}
 
 }
@@ -53,7 +53,7 @@ func (d *dashboardDisplay) UpdateDistance(distance float64) {
 func (d *dashboardDisplay) UpdateSecond(seconds int) {
 	if seconds != d.second {
 		d.printDurationDigits(seconds, SECOND_CHANGED)
-		d.second = seconds
+		d.second = -1
 	}
 
 }
@@ -61,7 +61,7 @@ func (d *dashboardDisplay) UpdateSecond(seconds int) {
 func (d *dashboardDisplay) UpdateMinute(minutes int) {
 	if minutes != d.minute {
 		d.printDurationDigits(minutes, MINUTE_CHANGED)
-		d.minute = minutes
+		d.minute = -1
 	}
 
 }
@@ -69,7 +69,7 @@ func (d *dashboardDisplay) UpdateMinute(minutes int) {
 func (d *dashboardDisplay) UpdateHour(hours int) {
 	if hours != d.hour {
 		d.printDurationDigits(hours, HOUR_CHANGED)
-		d.hour = hours
+		d.hour = -1
 	}
 
 }
