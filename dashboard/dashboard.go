@@ -1,7 +1,7 @@
 package dashboard
 
 import (
-	"math"
+	"fmt"
 
 	"github.com/marksaravi/devices-go/devices/display"
 )
@@ -10,23 +10,12 @@ type TimeChanged = int
 type dashboardDisplay struct {
 	display display.RGBDisplay
 	theme   Theme
-
-	second   int
-	minute   int
-	hour     int
-	speed    float64
-	distance float64
 }
 
 func NewDashboardDisplay(display display.RGBDisplay) *dashboardDisplay {
 	return &dashboardDisplay{
-		display:  display,
-		theme:    DarkTheme,
-		speed:    -1,
-		distance: -1,
-		second:   -1,
-		minute:   -1,
-		hour:     -1,
+		display: display,
+		theme:   DarkTheme,
 	}
 }
 
@@ -35,43 +24,28 @@ func (d *dashboardDisplay) Initialise() {
 }
 
 func (d *dashboardDisplay) UpdateSpeed(speed float64) {
-	if math.Abs(speed-d.speed) > 0.25 {
-		d.printSpeed(speed)
-		d.speed = -1
-	}
+	x := DATA_X
+	y := SPEED_DATA_LINE_Y
+	d.printDigits(fmt.Sprintf("%3.1f", speed), SPEED_DATA_FONT, d.theme.SpeedDataColor, x, y)
 
 }
 
 func (d *dashboardDisplay) UpdateDistance(distance float64) {
-	if distance != d.distance {
-		d.printDistance(distance)
-		d.distance = -1
-	}
-
+	x := DATA_X
+	y := DISTANCE_DATA_LINE_Y
+	d.printDigits(fmt.Sprintf("%4.2f", distance/1000), DISTANCE_DATA_FONT, d.theme.DistanceDataColor, x, y)
 }
 
 func (d *dashboardDisplay) UpdateSecond(seconds int) {
-	if seconds != d.second {
-		d.printDurationDigits(seconds, SECOND_CHANGED)
-		d.second = -1
-	}
-
+	d.printDurationDigits(seconds, SECOND_CHANGED)
 }
 
 func (d *dashboardDisplay) UpdateMinute(minutes int) {
-	if minutes != d.minute {
-		d.printDurationDigits(minutes, MINUTE_CHANGED)
-		d.minute = -1
-	}
-
+	d.printDurationDigits(minutes, MINUTE_CHANGED)
 }
 
 func (d *dashboardDisplay) UpdateHour(hours int) {
-	if hours != d.hour {
-		d.printDurationDigits(hours, HOUR_CHANGED)
-		d.hour = -1
-	}
-
+	d.printDurationDigits(hours, HOUR_CHANGED)
 }
 
 func (d *dashboardDisplay) UpdateDisplay() {

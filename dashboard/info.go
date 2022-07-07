@@ -14,20 +14,6 @@ func (d *dashboardDisplay) printDigits(digits string, font fonts.BitmapFont, col
 	d.display.Write(digits)
 }
 
-func (d *dashboardDisplay) printSpeed(speed float64) {
-	d.speed = speed
-	x := DATA_X
-	y := SPEED_DATA_LINE_Y
-	d.printDigits(fmt.Sprintf("%3.1f", d.speed), SPEED_DATA_FONT, d.theme.SpeedDataColor, x, y)
-}
-
-func (d *dashboardDisplay) printDistance(distance float64) {
-	d.distance = distance
-	x := DATA_X
-	y := DISTANCE_DATA_LINE_Y
-	d.printDigits(fmt.Sprintf("%4.2f", distance/1000), DISTANCE_DATA_FONT, d.theme.DistanceDataColor, x, y)
-}
-
 func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
 	digits := fmt.Sprintf("%02d", t)
 	x := DATA_X
