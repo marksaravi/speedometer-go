@@ -8,6 +8,7 @@ import (
 // basic dimensions
 const (
 	SEG_HEIGHT            int = 24
+	SEG_WIDTH             int = 32
 	LOWER_MARGIN_LABEL    int = 12
 	LOWER_MARGIN_DATA     int = 12
 	LEFT_MARGIN           int = 16
@@ -19,6 +20,10 @@ const (
 	DURATION_DATA_LINE_Y  int = 8*SEG_HEIGHT - LOWER_MARGIN_DATA
 	LABEL_COLUMN          int = 0
 	DATA_COLUMN           int = 120
+	TIME_DATA_COLUMN      int = SEG_WIDTH*2 + 16
+	TIME_DIGIT_WIDTH      int = 36
+	TIME_COLON_WIDTH      int = 14
+	TIME_COLON_OFFSET     int = 4
 )
 
 // Fonts

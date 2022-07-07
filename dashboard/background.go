@@ -54,25 +54,6 @@ func (d *dashboardDisplay) printLabels() {
 	)
 }
 
-func (d *dashboardDisplay) printDurationColons() {
-	x := LEFT_MARGIN + DATA_COLUMN + DIGIT_WIDTH + 4
-	y := DURATION_DATA_LINE_Y
-	d.writeText(
-		":",
-		DURATION_DATA_FONT,
-		d.theme.DurationDataColor,
-		x,
-		y,
-	)
-	d.writeText(
-		":",
-		DURATION_DATA_FONT,
-		d.theme.DurationDataColor,
-		x+DIGIT_WIDTH+COLON_WIDTH,
-		y,
-	)
-}
-
 func (d *dashboardDisplay) drawGrids() {
 	d.display.SetColor(colors.LIGHTGRAY)
 	for x := float64(32); x < 319; x += 32 {
