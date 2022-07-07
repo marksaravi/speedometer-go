@@ -30,7 +30,7 @@ func (d *dashboardDisplay) printDistance(distance float64) {
 
 func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
 	digits := fmt.Sprintf("%02d", t)
-	x := LABEL_X + TIME_DATA_COLUMN
+	x := DATA_X
 	y := DURATION_DATA_LINE_Y
 	DIGIT_OFFSET := TIME_DIGIT_WIDTH + TIME_COLON_WIDTH
 	if change == MINUTE_CHANGED {
@@ -43,7 +43,7 @@ func (d *dashboardDisplay) printDurationDigits(t int, change TimeChanged) {
 }
 
 func (d *dashboardDisplay) printDurationColons() {
-	x := LABEL_X + TIME_DATA_COLUMN + TIME_DIGIT_WIDTH + TIME_COLON_OFFSET
+	x := DATA_X + TIME_DIGIT_WIDTH + TIME_COLON_OFFSET
 	y := DURATION_DATA_LINE_Y
 	d.writeText(
 		":",
