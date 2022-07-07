@@ -56,9 +56,9 @@ func (d *dashboardDisplay) UpdateDisplay() {
 }
 
 func (d *dashboardDisplay) printDigits(digits string, font fonts.BitmapFont, color colors.Color, x, y int) {
+	d.setTextSettings(font, color, x, y)
 	x1, y1, x2, y2 := d.display.GetTextArea(digits)
 	d.display.ClearArea(float64(x+x1), float64(y+y1), float64(x+x2), float64(y+y2))
-	d.setTextSettings(font, color, x, y)
 	d.display.Write(digits)
 }
 

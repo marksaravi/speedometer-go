@@ -2,11 +2,14 @@ package speedometer
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/marksaravi/speedometer-go/dashboard"
 	"periph.io/x/conn/v3/gpio"
 )
+
+var randomNumber = rand.New(rand.NewSource(time.Now().UnixMilli()))
 
 func NewSpeedometer() *speedometerDev {
 	config := ReadConfigs()
@@ -37,8 +40,6 @@ func NewSpeedometer() *speedometerDev {
 
 func (s *speedometerDev) Run() {
 	lastUpdate := time.Now()
-	// ts := time.Now()
-	// var max time.Duration = 0
 	s.speedPulses = append(s.speedPulses, time.Now().Add(-time.Second*86400))
 	pulseChannel := make(chan time.Time)
 	go func() {
@@ -63,18 +64,13 @@ func (s *speedometerDev) Run() {
 
 		default:
 		}
-		// if d := time.Since(ts); d > max {
-		// 	max = d
-		// }
-		// ts = time.Now()
-		// s.pulseCounter()
 
 		if time.Since(lastUpdate) >= time.Millisecond*950 {
 			s.updateSpeedDistanceDuration()
 			lastUpdate = time.Now()
-			fmt.Printf("%3d, %6.2f, %6.3f, %2d\n", s.counter, s.speed, s.distance, len(s.speedPulses))
-			// max = 0
+			ts := time.Now()
 			s.update()
+			fmt.Printf("%3d, %6.2f, %6.3f, %2v\n", s.counter, s.speed, s.distance, time.Since(ts))
 		}
 	}
 }
@@ -134,9 +130,12 @@ func (s *speedometerDev) updateSpeedDistanceDuration() {
 	if s.speed < 0.2 {
 		s.speed = 0
 	}
-
 	s.distance = s.distPerPulse * float64(s.counter)
 	s.dur = time.Since(s.startTime)
+
+	s.speed = randomNumber.Float64() * 50
+	s.distance = randomNumber.Float64() * 50000
+	s.dur = time.Duration((randomNumber.Float64() * 3600 * 8) * float64(time.Second))
 }
 
 func (s *speedometerDev) readReset() {
