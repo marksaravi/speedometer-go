@@ -24,16 +24,17 @@ func NewSpeedometer() *speedometerDev {
 		distPerPulse:      config.DistancePerPulse,
 		sleepAfterPulseMS: config.SleepAfterPulseMS,
 
-		startTime:  time.Now(),
-		counter:    0,
-		pulse:      gpio.Low,
-		resetLevel: gpio.Low,
-		resetTime:  time.Now(),
+		startTime: time.Now(),
+		counter:   0,
+		pulse:     gpio.Low,
+		resetTime: time.Now(),
 
 		speedPulses: make([]time.Time, 0),
 		speed:       0,
 		distance:    0,
 		dur:         0,
+		lastUpdate:  time.Now(),
+		updateTurn:  0,
 	}
 	return &speedo
 }
@@ -79,7 +80,6 @@ func (s *speedometerDev) resetAll() {
 	s.counter = 0
 	s.startTime = time.Now()
 	s.pulse = gpio.Low
-	s.resetLevel = gpio.Low
 }
 
 var tpulse = time.Now()
@@ -156,12 +156,26 @@ func getSecMinHour(d time.Duration) (int, int, int) {
 }
 
 func (s *speedometerDev) update() {
+	if time.Since(s.lastUpdate) < time.Millisecond*330 {
+		return
+	}
 	seconds, minutes, hours := getSecMinHour(s.dur)
-	s.lcd.UpdateDuration(seconds, dashboard.SECOND_CHANGED)
-	s.lcd.UpdateDuration(minutes, dashboard.MINUTE_CHANGED)
-	s.lcd.UpdateDuration(hours, dashboard.HOUR_CHANGED)
-	s.lcd.UpdateSpeed(s.speed)
-	s.lcd.UpdateDistance(s.distance)
+	switch s.updateTurn {
+	case 0:
+		s.lcd.UpdateDuration(seconds, dashboard.SECOND_CHANGED)
+	case 1:
+		s.lcd.UpdateDuration(minutes, dashboard.MINUTE_CHANGED)
+	case 2:
+		s.lcd.UpdateDuration(hours, dashboard.HOUR_CHANGED)
+	case 3:
+		s.lcd.UpdateSpeed(s.speed)
+	case 4:
+		s.lcd.UpdateDistance(s.distance)
+	}
+	s.updateTurn++
+	if s.updateTurn == 5 {
+		s.updateTurn = 0
+	}
 	func() {
 		s.lcd.UpdateDisplay()
 	}()

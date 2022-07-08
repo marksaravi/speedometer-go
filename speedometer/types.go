@@ -31,11 +31,12 @@ type speedometerDev struct {
 
 	pulse gpio.Level
 
-	resetLevel gpio.Level
-	resetTime  time.Time
+	resetTime time.Time
 
 	speedPulses []time.Time
 	dur         time.Duration
 	distance    float64
 	speed       float64
+	lastUpdate  time.Time
+	updateTurn  int
 }
