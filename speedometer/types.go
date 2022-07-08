@@ -26,7 +26,6 @@ type speedometerDev struct {
 	distPerPulse      float64
 	pulseCounter      int64
 	displayUpdateTurn int
-	speed             float64
 	prevPulseLevel    gpio.Level
 	startOfRidingTime time.Time
 	resetPressedTime  time.Time

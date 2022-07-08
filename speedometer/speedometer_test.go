@@ -53,6 +53,12 @@ func TestSpeedPulsesPushThirdTime(t *testing.T) {
 	}
 }
 
-func TestCalcSpeed(t *testing.T) {
-
+func TestCalcSpeedNoPulse(t *testing.T) {
+	speedo := speedometerDev{
+		speedPulses: getSpeedPulsesZeroValue(),
+	}
+	speed := speedo.calcSpeed()
+	if speed != 0 {
+		t.Errorf("speed must be zero if not pulses")
+	}
 }

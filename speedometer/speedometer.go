@@ -35,7 +35,7 @@ func NewSpeedometer() *speedometerDev {
 func (s *speedometerDev) Run() {
 	for {
 		if s.readPulse() {
-			s.calcSpeed(time.Now())
+			s.pushSpeedPulse(time.Now())
 			s.triggerUpdate()
 		}
 		if s.canUpdate() {
@@ -93,24 +93,8 @@ func (s *speedometerDev) triggerUpdate() {
 func (s *speedometerDev) calcSpeedDistanceDuration() (
 	seconds, minutes, hours int, speed, distance float64,
 ) {
-	// var speedPulseDur time.Duration = time.Second
-	// if len(s.speedTimes) == 1 {
-	// 	speedPulseDur = time.Since(s.speedTimes[0])
-	// } else if len(s.speedTimes) == 2 {
-	// 	speedPulseDur = s.speedTimes[1].Sub(s.speedTimes[0])
-	// 	s.speedTimes = s.speedTimes[1:]
-	// }
-	// s.speed = s.distPerPulse / speedPulseDur.Seconds() * 3.6
-	// if s.speed < 0.2 {
-	// 	s.speed = 0
-	// }
-	// s.distance = s.distPerPulse * float64(s.counter)
-	// s.dur = time.Since(s.startTime)
 
-	// s.speed = randomNumber.Float64() * 50
-	// s.distance = randomNumber.Float64() * 50000
-	// dur = time.Duration((randomNumber.Float64() * 3600 * 8) * float64(time.Second))
-	speed = 0
+	speed = s.calcSpeed()
 	seconds, minutes, hours = getSecMinHour(time.Since(s.startOfRidingTime))
 	distance = s.distPerPulse * float64(s.pulseCounter)
 	return
@@ -155,19 +139,9 @@ func (s *speedometerDev) pushSpeedPulse(t time.Time) {
 	}
 }
 
-// func (s *speedometerDev) calcSpeed() float64 {
-// 	if len(s.speedTimes) < 2 {
-// 		return 0
-// 	}
-
-// 	return 0
-// }
-
-func (s *speedometerDev) calcSpeed(t time.Time) {
-	// if s.lastPulseTime.IsZero() {
-	// 	s.speed = 0
-	// } else {
-	// 	s.speed = s.distPerPulse * 1000000 / float64(time.Since(s.lastPulseTime).Microseconds()) * 3.6
-	// }
-	// s.lastPulseTime = t
+func (s *speedometerDev) calcSpeed() float64 {
+	if s.speedPulses[0].IsZero() {
+		return 0
+	}
+	return 0
 }
