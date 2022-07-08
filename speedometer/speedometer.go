@@ -8,7 +8,10 @@ import (
 	"periph.io/x/conn/v3/gpio"
 )
 
-const DISPLAY_UPDATE_TIMEOUT_MS = 200
+const (
+	DISPLAY_UPDATE_TIMEOUT_MS      = 330
+	DISPLAY_UPDATE_MIN_INTERVAL_MS = 200
+)
 
 func NewSpeedometer() *speedometerDev {
 	config := ReadConfigs()
@@ -32,13 +35,14 @@ func NewSpeedometer() *speedometerDev {
 
 func (s *speedometerDev) Run() {
 	for {
-		s.readPulse()
-		s.readReset()
+		if s.readPulse() {
+			s.triggerUpdate()
+		}
 		ts := time.Now()
 		if s.update() {
 			fmt.Println(time.Since(ts))
 		}
-
+		s.readReset()
 		// 	fmt.Printf("%3d, %6.2f, %6.3f, %2v\n", s.counter, s.speed, s.distance, time.Since(ts))
 	}
 }
@@ -58,13 +62,29 @@ func (s *speedometerDev) reset() {
 	s.prevPulseLevel = gpio.Low
 }
 
-func (s *speedometerDev) readPulse() {
+func (s *speedometerDev) readPulse() bool {
+	pulsed := false
 	level := s.pulsePinIn.Read()
 	if s.prevPulseLevel != level && level == gpio.Low {
 		s.pulseCounter++
-		s.displayUpdateTime = time.Now().Add(-time.Hour)
 	}
 	s.prevPulseLevel = level
+	return pulsed
+}
+
+func (s *speedometerDev) triggerUpdate() {
+	if time.Since(s.displayUpdateTime) < time.Millisecond*DISPLAY_UPDATE_MIN_INTERVAL_MS {
+		return
+	}
+	s.displayUpdateTime = time.Now().Add(-time.Millisecond * DISPLAY_UPDATE_TIMEOUT_MS * 2)
+}
+
+func (s *speedometerDev) canUpdate() bool {
+	if time.Since(s.displayUpdateTime) < time.Millisecond*DISPLAY_UPDATE_TIMEOUT_MS {
+		return false
+	}
+	s.displayUpdateTime = time.Now()
+	return true
 }
 
 func (s *speedometerDev) calcSpeedDistanceDuration() (
@@ -99,7 +119,7 @@ func getSecMinHour(d time.Duration) (int, int, int) {
 }
 
 func (s *speedometerDev) update() bool {
-	if time.Since(s.displayUpdateTime) < time.Millisecond*DISPLAY_UPDATE_TIMEOUT_MS {
+	if !s.canUpdate() {
 		return false
 	}
 	seconds, minutes, hours, speed, distance := s.calcSpeedDistanceDuration()
@@ -116,7 +136,7 @@ func (s *speedometerDev) update() bool {
 	case 4:
 		s.lcd.UpdateDistance(distance)
 	}
-	s.displayUpdateTime = time.Now()
+
 	s.displayUpdateTurn++
 	if s.displayUpdateTurn == 5 {
 		s.displayUpdateTurn = 0
