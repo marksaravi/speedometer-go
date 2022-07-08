@@ -9,8 +9,7 @@ import (
 )
 
 const (
-	DISPLAY_UPDATE_TIMEOUT_MS      = 180
-	DISPLAY_UPDATE_MIN_INTERVAL_MS = 200
+	DISPLAY_UPDATE_TIMEOUT_MS = 100
 )
 
 func NewSpeedometer() *speedometerDev {
@@ -70,19 +69,19 @@ func (s *speedometerDev) readPulse() bool {
 	return pulsed
 }
 
-func (s *speedometerDev) triggerUpdate() {
-	if time.Since(s.displayUpdateTime) < time.Millisecond*DISPLAY_UPDATE_MIN_INTERVAL_MS {
-		return
-	}
-	s.displayUpdateTime = time.Now().Add(-time.Millisecond * DISPLAY_UPDATE_TIMEOUT_MS * 2)
-}
-
 func (s *speedometerDev) canUpdate() bool {
 	if time.Since(s.displayUpdateTime) < time.Millisecond*DISPLAY_UPDATE_TIMEOUT_MS {
 		return false
 	}
 	s.displayUpdateTime = time.Now()
 	return true
+}
+
+func (s *speedometerDev) triggerUpdate() {
+	const DT = time.Millisecond * DISPLAY_UPDATE_TIMEOUT_MS / 5
+	if time.Since(s.displayUpdateTime) > time.Millisecond*DISPLAY_UPDATE_TIMEOUT_MS-DT {
+		s.displayUpdateTime = time.Now().Add(-time.Millisecond*DISPLAY_UPDATE_TIMEOUT_MS - DT)
+	}
 }
 
 func (s *speedometerDev) calcSpeedDistanceDuration() (
