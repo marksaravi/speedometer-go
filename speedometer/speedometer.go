@@ -10,6 +10,7 @@ import (
 
 const (
 	DISPLAY_UPDATE_TIMEOUT_MS = 100
+	SPEED_CALC_PERIOD         = time.Second * 5
 )
 
 func NewSpeedometer() *speedometerDev {
@@ -18,16 +19,15 @@ func NewSpeedometer() *speedometerDev {
 	lcd.Initialise()
 
 	speedo := speedometerDev{
-		pulsePinIn:         createGpioInputPin("GPIO14"),
-		resetPinIn:         createGpioInputPin("GPIO15"),
-		lcd:                lcd,
-		distPerPulse:       config.DistancePerPulse,
-		startOfRidingTime:  time.Now(),
-		resetPressedTime:   time.Now(),
-		speedPulseTimeFrom: time.Time{},
-		speedPulseTimeTo:   time.Time{},
-		pulseCounter:       0,
-		displayUpdateTurn:  0,
+		pulsePinIn:        createGpioInputPin("GPIO14"),
+		resetPinIn:        createGpioInputPin("GPIO15"),
+		lcd:               lcd,
+		distPerPulse:      config.DistancePerPulse,
+		startOfRidingTime: time.Now(),
+		resetPressedTime:  time.Now(),
+		speedPulses:       getSpeedPulsesZeroValue(),
+		pulseCounter:      0,
+		displayUpdateTurn: 0,
 	}
 	return &speedo
 }
@@ -35,6 +35,7 @@ func NewSpeedometer() *speedometerDev {
 func (s *speedometerDev) Run() {
 	for {
 		if s.readPulse() {
+			s.calcSpeed(time.Now())
 			s.triggerUpdate()
 		}
 		if s.canUpdate() {
@@ -57,6 +58,11 @@ func (s *speedometerDev) reset() {
 	s.pulseCounter = 0
 	s.startOfRidingTime = time.Now()
 	s.prevPulseLevel = gpio.Low
+	s.speedPulses = getSpeedPulsesZeroValue()
+}
+
+func getSpeedPulsesZeroValue() [2]time.Time {
+	return [2]time.Time{time.Time{}, time.Time{}}
 }
 
 func (s *speedometerDev) readPulse() bool {
@@ -88,11 +94,11 @@ func (s *speedometerDev) calcSpeedDistanceDuration() (
 	seconds, minutes, hours int, speed, distance float64,
 ) {
 	// var speedPulseDur time.Duration = time.Second
-	// if len(s.speedPulses) == 1 {
-	// 	speedPulseDur = time.Since(s.speedPulses[0])
-	// } else if len(s.speedPulses) == 2 {
-	// 	speedPulseDur = s.speedPulses[1].Sub(s.speedPulses[0])
-	// 	s.speedPulses = s.speedPulses[1:]
+	// if len(s.speedTimes) == 1 {
+	// 	speedPulseDur = time.Since(s.speedTimes[0])
+	// } else if len(s.speedTimes) == 2 {
+	// 	speedPulseDur = s.speedTimes[1].Sub(s.speedTimes[0])
+	// 	s.speedTimes = s.speedTimes[1:]
 	// }
 	// s.speed = s.distPerPulse / speedPulseDur.Seconds() * 3.6
 	// if s.speed < 0.2 {
@@ -138,4 +144,30 @@ func (s *speedometerDev) update() bool {
 	s.lcd.UpdateDisplay()
 	fmt.Println(time.Since(ts))
 	return true
+}
+
+func (s *speedometerDev) pushSpeedPulse(t time.Time) {
+	if s.speedPulses[1].IsZero() {
+		s.speedPulses[1] = t
+	} else {
+		s.speedPulses[0] = s.speedPulses[1]
+		s.speedPulses[1] = t
+	}
+}
+
+// func (s *speedometerDev) calcSpeed() float64 {
+// 	if len(s.speedTimes) < 2 {
+// 		return 0
+// 	}
+
+// 	return 0
+// }
+
+func (s *speedometerDev) calcSpeed(t time.Time) {
+	// if s.lastPulseTime.IsZero() {
+	// 	s.speed = 0
+	// } else {
+	// 	s.speed = s.distPerPulse * 1000000 / float64(time.Since(s.lastPulseTime).Microseconds()) * 3.6
+	// }
+	// s.lastPulseTime = t
 }

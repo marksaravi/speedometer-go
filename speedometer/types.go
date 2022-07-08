@@ -20,16 +20,16 @@ type lcdDisplay interface {
 }
 
 type speedometerDev struct {
-	pulsePinIn         gpio.PinIn
-	resetPinIn         gpio.PinIn
-	lcd                lcdDisplay
-	distPerPulse       float64
-	pulseCounter       int64
-	displayUpdateTurn  int
-	prevPulseLevel     gpio.Level
-	startOfRidingTime  time.Time
-	resetPressedTime   time.Time
-	displayUpdateTime  time.Time
-	speedPulseTimeFrom time.Time
-	speedPulseTimeTo   time.Time
+	pulsePinIn        gpio.PinIn
+	resetPinIn        gpio.PinIn
+	lcd               lcdDisplay
+	distPerPulse      float64
+	pulseCounter      int64
+	displayUpdateTurn int
+	speed             float64
+	prevPulseLevel    gpio.Level
+	startOfRidingTime time.Time
+	resetPressedTime  time.Time
+	displayUpdateTime time.Time
+	speedPulses       [2]time.Time
 }
