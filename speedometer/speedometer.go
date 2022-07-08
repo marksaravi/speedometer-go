@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DISPLAY_UPDATE_TIMEOUT_MS      = 330
+	DISPLAY_UPDATE_TIMEOUT_MS      = 180
 	DISPLAY_UPDATE_MIN_INTERVAL_MS = 200
 )
 
@@ -38,12 +38,10 @@ func (s *speedometerDev) Run() {
 		if s.readPulse() {
 			s.triggerUpdate()
 		}
-		ts := time.Now()
-		if s.update() {
-			fmt.Println(time.Since(ts))
+		if s.canUpdate() {
+			s.update()
 		}
 		s.readReset()
-		// 	fmt.Printf("%3d, %6.2f, %6.3f, %2v\n", s.counter, s.speed, s.distance, time.Since(ts))
 	}
 }
 
@@ -119,9 +117,7 @@ func getSecMinHour(d time.Duration) (int, int, int) {
 }
 
 func (s *speedometerDev) update() bool {
-	if !s.canUpdate() {
-		return false
-	}
+	ts := time.Now()
 	seconds, minutes, hours, speed, distance := s.calcSpeedDistanceDuration()
 
 	switch s.displayUpdateTurn {
@@ -136,11 +132,11 @@ func (s *speedometerDev) update() bool {
 	case 4:
 		s.lcd.UpdateDistance(distance)
 	}
-
 	s.displayUpdateTurn++
 	if s.displayUpdateTurn == 5 {
 		s.displayUpdateTurn = 0
 	}
 	s.lcd.UpdateDisplay()
+	fmt.Println(time.Since(ts))
 	return true
 }
