@@ -28,7 +28,6 @@ func (d *dashboardDisplay) UpdateSpeed(speed float64) {
 	x := DATA_X
 	y := SPEED_DATA_LINE_Y
 	d.printDigits(fmt.Sprintf("%3.1f", speed), SPEED_DATA_FONT, d.theme.SpeedDataColor, x, y)
-
 }
 
 func (d *dashboardDisplay) UpdateDistance(distance float64) {
