@@ -38,6 +38,21 @@ func TestSpeedPulsesPushSecondTime(t *testing.T) {
 	}
 }
 
+func TestSpeedPulsesPushThirdTime(t *testing.T) {
+	speedo := speedometerDev{
+		speedPulses: getSpeedPulsesZeroValue(),
+	}
+	t0 := time.Now().Add(-time.Second * 2)
+	t1 := time.Now().Add(-time.Second)
+	t2 := time.Now()
+	speedo.pushSpeedPulse(t0)
+	speedo.pushSpeedPulse(t1)
+	speedo.pushSpeedPulse(t2)
+	if speedo.speedPulses[0] != t1 || speedo.speedPulses[1] != t2 {
+		t.Errorf("time[0] must be %v and time[1] must be %v", t1, t2)
+	}
+}
+
 func TestCalcSpeed(t *testing.T) {
 
 }
