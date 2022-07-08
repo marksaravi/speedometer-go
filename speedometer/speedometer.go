@@ -62,7 +62,7 @@ func (s *speedometerDev) reset() {
 }
 
 func getSpeedPulsesZeroValue() [2]time.Time {
-	return [2]time.Time{time.Time{}, time.Time{}}
+	return [2]time.Time{{}, {}}
 }
 
 func (s *speedometerDev) readPulse() bool {
@@ -94,7 +94,7 @@ func (s *speedometerDev) calcSpeedDistanceDuration() (
 	seconds, minutes, hours int, speed, distance float64,
 ) {
 
-	speed = s.calcSpeed()
+	speed = s.calcSpeed(time.Now())
 	seconds, minutes, hours = getSecMinHour(time.Since(s.startOfRidingTime))
 	distance = s.distPerPulse * float64(s.pulseCounter)
 	return
@@ -139,9 +139,15 @@ func (s *speedometerDev) pushSpeedPulse(t time.Time) {
 	}
 }
 
-func (s *speedometerDev) calcSpeed() float64 {
+func (s *speedometerDev) calcSpeed(t time.Time) float64 {
 	if s.speedPulses[0].IsZero() {
 		return 0
 	}
-	return 0
+	durToT1T0 := s.speedPulses[1].Sub(s.speedPulses[0])
+	durToT1 := t.Sub(s.speedPulses[1])
+	dur := durToT1T0
+	if durToT1 > durToT1T0 {
+		dur = t.Sub(s.speedPulses[0])
+	}
+	return s.distPerPulse * 1000000 / float64(dur.Microseconds()) * 3.6
 }
