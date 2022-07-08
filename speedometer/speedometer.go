@@ -2,14 +2,13 @@ package speedometer
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 
 	"github.com/marksaravi/speedometer-go/dashboard"
 	"periph.io/x/conn/v3/gpio"
 )
 
-var randomNumber = rand.New(rand.NewSource(time.Now().UnixMilli()))
+const DISPLAY_UPDATE_TIMEOUT_MS = 200
 
 func NewSpeedometer() *speedometerDev {
 	config := ReadConfigs()
@@ -17,137 +16,81 @@ func NewSpeedometer() *speedometerDev {
 	lcd.Initialise()
 
 	speedo := speedometerDev{
-		input: createGpioInputPin("GPIO14"),
-		reset: createGpioInputPin("GPIO15"),
-		lcd:   lcd,
-
-		distPerPulse:      config.DistancePerPulse,
-		sleepAfterPulseMS: config.SleepAfterPulseMS,
-
-		startTime: time.Now(),
-		counter:   0,
-		pulse:     gpio.Low,
-		resetTime: time.Now(),
-
-		speedPulses: make([]time.Time, 0),
-		speed:       0,
-		distance:    0,
-		dur:         0,
-		lastUpdate:  time.Now(),
-		updateTurn:  0,
+		pulsePinIn:         createGpioInputPin("GPIO14"),
+		resetPinIn:         createGpioInputPin("GPIO15"),
+		lcd:                lcd,
+		distPerPulse:       config.DistancePerPulse,
+		startOfRidingTime:  time.Now(),
+		resetPressedTime:   time.Now(),
+		speedPulseTimeFrom: time.Time{},
+		speedPulseTimeTo:   time.Time{},
+		pulseCounter:       0,
+		displayUpdateTurn:  0,
 	}
 	return &speedo
 }
 
 func (s *speedometerDev) Run() {
-	lastUpdate := time.Now()
-	s.speedPulses = append(s.speedPulses, time.Now().Add(-time.Second*86400))
-	pulseChannel := make(chan time.Time)
-	go func() {
-		prevLevel := gpio.Low
-		for {
-			time.Sleep(time.Millisecond)
-			level := s.input.Read()
-			if prevLevel != level && level == gpio.Low {
-				pulseChannel <- time.Now()
-			}
-			prevLevel = level
-		}
-	}()
 	for {
-		select {
-		case pulseTime := <-pulseChannel:
-			s.counter++
-			if len(s.speedPulses) == 2 {
-				s.speedPulses = s.speedPulses[1:]
-			}
-			s.speedPulses = append(s.speedPulses, pulseTime)
-
-		default:
+		s.readPulse()
+		s.readReset()
+		ts := time.Now()
+		if s.update() {
+			fmt.Println(time.Since(ts))
 		}
 
-		if time.Since(lastUpdate) >= time.Millisecond*950 {
-			s.updateSpeedDistanceDuration()
-			lastUpdate = time.Now()
-			ts := time.Now()
-			s.update()
-			fmt.Printf("%3d, %6.2f, %6.3f, %2v\n", s.counter, s.speed, s.distance, time.Since(ts))
-		}
+		// 	fmt.Printf("%3d, %6.2f, %6.3f, %2v\n", s.counter, s.speed, s.distance, time.Since(ts))
 	}
-}
-
-func (s *speedometerDev) resetAll() {
-	s.counter = 0
-	s.startTime = time.Now()
-	s.pulse = gpio.Low
-}
-
-var tpulse = time.Now()
-var MILLISECONDS float64 = 64
-
-func (s *speedometerDev) pulseFaker() gpio.Level {
-	pulse := s.pulse
-	if s.pulse == gpio.Low && time.Since(tpulse) >= time.Millisecond*time.Duration((MILLISECONDS)) {
-		pulse = gpio.High
-		tpulse = time.Now()
-	}
-
-	if s.pulse == gpio.High && time.Since(tpulse) >= time.Millisecond*time.Duration((MILLISECONDS)/8) {
-		pulse = gpio.Low
-		tpulse = time.Now()
-	}
-	return pulse
-}
-
-func (s *speedometerDev) pulseCounter() bool {
-	// pulse := s.input.Read()
-	pulse := s.pulseFaker()
-	isPulsed := false
-
-	if pulse != s.pulse {
-		if pulse == gpio.Low {
-			s.counter++
-			if len(s.speedPulses) == 2 {
-				s.speedPulses = s.speedPulses[1:]
-			}
-			s.speedPulses = append(s.speedPulses, time.Now())
-			isPulsed = true
-		}
-		s.pulse = pulse
-	}
-	return isPulsed
-}
-
-func (s *speedometerDev) updateSpeedDistanceDuration() {
-	var speedPulseDur time.Duration = time.Second
-	if len(s.speedPulses) == 1 {
-		speedPulseDur = time.Since(s.speedPulses[0])
-	} else if len(s.speedPulses) == 2 {
-		speedPulseDur = s.speedPulses[1].Sub(s.speedPulses[0])
-		s.speedPulses = s.speedPulses[1:]
-	}
-	s.speed = s.distPerPulse / speedPulseDur.Seconds() * 3.6
-	if s.speed < 0.2 {
-		s.speed = 0
-	}
-	s.distance = s.distPerPulse * float64(s.counter)
-	s.dur = time.Since(s.startTime)
-
-	s.speed = randomNumber.Float64() * 50
-	s.distance = randomNumber.Float64() * 50000
-	s.dur = time.Duration((randomNumber.Float64() * 3600 * 8) * float64(time.Second))
 }
 
 func (s *speedometerDev) readReset() {
-	reset := s.reset.Read()
-	if reset == gpio.Low {
-		s.resetTime = time.Now()
+	if s.resetPinIn.Read() == gpio.Low {
+		s.resetPressedTime = time.Now()
 	}
-	if reset == gpio.High {
-		if time.Since(s.resetTime) > time.Second*3 {
-			s.resetAll()
-		}
+	if time.Since(s.resetPressedTime) > time.Second*3 {
+		s.reset()
 	}
+}
+
+func (s *speedometerDev) reset() {
+	s.pulseCounter = 0
+	s.startOfRidingTime = time.Now()
+	s.prevPulseLevel = gpio.Low
+}
+
+func (s *speedometerDev) readPulse() {
+	level := s.pulsePinIn.Read()
+	if s.prevPulseLevel != level && level == gpio.Low {
+		s.pulseCounter++
+		s.displayUpdateTime = time.Now().Add(-time.Hour)
+	}
+	s.prevPulseLevel = level
+}
+
+func (s *speedometerDev) calcSpeedDistanceDuration() (
+	seconds, minutes, hours int, speed, distance float64,
+) {
+	// var speedPulseDur time.Duration = time.Second
+	// if len(s.speedPulses) == 1 {
+	// 	speedPulseDur = time.Since(s.speedPulses[0])
+	// } else if len(s.speedPulses) == 2 {
+	// 	speedPulseDur = s.speedPulses[1].Sub(s.speedPulses[0])
+	// 	s.speedPulses = s.speedPulses[1:]
+	// }
+	// s.speed = s.distPerPulse / speedPulseDur.Seconds() * 3.6
+	// if s.speed < 0.2 {
+	// 	s.speed = 0
+	// }
+	// s.distance = s.distPerPulse * float64(s.counter)
+	// s.dur = time.Since(s.startTime)
+
+	// s.speed = randomNumber.Float64() * 50
+	// s.distance = randomNumber.Float64() * 50000
+	// dur = time.Duration((randomNumber.Float64() * 3600 * 8) * float64(time.Second))
+	speed = 0
+	seconds, minutes, hours = getSecMinHour(time.Since(s.startOfRidingTime))
+	distance = s.distPerPulse * float64(s.pulseCounter)
+	return
 }
 
 func getSecMinHour(d time.Duration) (int, int, int) {
@@ -155,12 +98,13 @@ func getSecMinHour(d time.Duration) (int, int, int) {
 	return seconds % 60, seconds / 60 % 60, seconds / 3600
 }
 
-func (s *speedometerDev) update() {
-	if time.Since(s.lastUpdate) < time.Millisecond*330 {
-		return
+func (s *speedometerDev) update() bool {
+	if time.Since(s.displayUpdateTime) < time.Millisecond*DISPLAY_UPDATE_TIMEOUT_MS {
+		return false
 	}
-	seconds, minutes, hours := getSecMinHour(s.dur)
-	switch s.updateTurn {
+	seconds, minutes, hours, speed, distance := s.calcSpeedDistanceDuration()
+
+	switch s.displayUpdateTurn {
 	case 0:
 		s.lcd.UpdateDuration(seconds, dashboard.SECOND_CHANGED)
 	case 1:
@@ -168,15 +112,15 @@ func (s *speedometerDev) update() {
 	case 2:
 		s.lcd.UpdateDuration(hours, dashboard.HOUR_CHANGED)
 	case 3:
-		s.lcd.UpdateSpeed(s.speed)
+		s.lcd.UpdateSpeed(speed)
 	case 4:
-		s.lcd.UpdateDistance(s.distance)
+		s.lcd.UpdateDistance(distance)
 	}
-	s.updateTurn++
-	if s.updateTurn == 5 {
-		s.updateTurn = 0
+	s.displayUpdateTime = time.Now()
+	s.displayUpdateTurn++
+	if s.displayUpdateTurn == 5 {
+		s.displayUpdateTurn = 0
 	}
-	func() {
-		s.lcd.UpdateDisplay()
-	}()
+	s.lcd.UpdateDisplay()
+	return true
 }
