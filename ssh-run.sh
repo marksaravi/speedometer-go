@@ -15,9 +15,9 @@ copy_codes(){
 # copy_codes ./cmd/speedometer main.go
 # copy_codes ./dashboard info.go
 # copy_codes ./dashboard types.go
-# copy_codes ./dashboard constants.go
+copy_codes ./dashboard constants.go
 copy_codes ./dashboard dashboard.go
-copy_codes ./dashboard background.go
+# copy_codes ./dashboard background.go
 # copy_codes ./dashboard theme.go
 
 ssh -t $raspizero "cd ~/go/src/speedometer-go; /usr/local/go/bin/go run ./cmd/speedometer"

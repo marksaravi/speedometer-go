@@ -49,7 +49,7 @@ func (d *dashboardDisplay) UpdateDistance(distance float64) {
 
 func (d *dashboardDisplay) UpdateDuration(t int, change int) {
 	digits := fmt.Sprintf("%02d", t)
-	x := DATA_X
+	x := DATA_DUR_X
 	y := DURATION_DATA_LINE_Y
 	clearIndex := 2
 	DIGIT_OFFSET := TIME_DIGIT_WIDTH + TIME_COLON_WIDTH
@@ -87,7 +87,7 @@ func (d *dashboardDisplay) clearArea(text string, x, y, clearZoneIndex int) {
 }
 
 func (d *dashboardDisplay) printDurationColons() {
-	x := DATA_X + TIME_DIGIT_WIDTH + TIME_COLON_OFFSET
+	x := DATA_DUR_X + TIME_DIGIT_WIDTH + TIME_COLON_OFFSET
 	y := DURATION_DATA_LINE_Y
 	d.writeText(
 		":",
