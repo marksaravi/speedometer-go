@@ -30,5 +30,7 @@ type speedometerDev struct {
 	startOfRidingTime time.Time
 	resetPressedTime  time.Time
 	displayUpdateTime time.Time
-	speedPulses       [2]time.Time
+	// speedPulses       [2]time.Time
+	speedPulseFrom time.Time
+	speedPulseTo   time.Time
 }

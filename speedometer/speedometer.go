@@ -25,7 +25,9 @@ func NewSpeedometer() *speedometerDev {
 		distPerPulse:      config.DistancePerPulse,
 		startOfRidingTime: time.Now(),
 		resetPressedTime:  time.Now(),
-		speedPulses:       getSpeedPulsesZeroValue(),
+		// speedPulses:       getSpeedPulsesZeroValue(),
+		speedPulseFrom:    time.Time{},
+		speedPulseTo:      time.Time{},
 		pulseCounter:      0,
 		displayUpdateTurn: 0,
 	}
@@ -58,7 +60,8 @@ func (s *speedometerDev) reset() {
 	s.pulseCounter = 0
 	s.startOfRidingTime = time.Now()
 	s.prevPulseLevel = gpio.Low
-	s.speedPulses = getSpeedPulsesZeroValue()
+	s.speedPulseFrom = time.Time{}
+	s.speedPulseTo = time.Time{}
 }
 
 func getSpeedPulsesZeroValue() [2]time.Time {
@@ -126,28 +129,24 @@ func (s *speedometerDev) update() bool {
 		s.displayUpdateTurn = 0
 	}
 	s.lcd.UpdateDisplay()
-	fmt.Println(time.Since(ts))
+	fmt.Println(time.Since(ts), ", ", speed)
 	return true
 }
 
 func (s *speedometerDev) pushSpeedPulse(t time.Time) {
-	if s.speedPulses[1].IsZero() {
-		s.speedPulses[1] = t
-	} else {
-		s.speedPulses[0] = s.speedPulses[1]
-		s.speedPulses[1] = t
-	}
+	s.speedPulseFrom = s.speedPulseTo
+	s.speedPulseTo = t
 }
 
 func (s *speedometerDev) calcSpeed(t time.Time) float64 {
-	if s.speedPulses[0].IsZero() {
+	if s.speedPulseFrom.IsZero() {
 		return 0
 	}
-	durToT1T0 := s.speedPulses[1].Sub(s.speedPulses[0])
-	durToT1 := t.Sub(s.speedPulses[1])
+	durToT1T0 := s.speedPulseTo.Sub(s.speedPulseFrom)
+	durToT1 := t.Sub(s.speedPulseTo)
 	dur := durToT1T0
 	if durToT1 > durToT1T0 {
-		dur = t.Sub(s.speedPulses[0])
+		dur = t.Sub(s.speedPulseFrom)
 	}
 	return s.distPerPulse * 1000000 / float64(dur.Microseconds()) * 3.6
 }

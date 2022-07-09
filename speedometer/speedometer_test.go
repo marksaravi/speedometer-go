@@ -7,40 +7,44 @@ import (
 
 func TestSpeedPulsesZeroValue(t *testing.T) {
 	speedo := speedometerDev{
-		speedPulses: getSpeedPulsesZeroValue(),
+		speedPulseFrom: time.Time{},
+		speedPulseTo:   time.Time{},
 	}
-	if !speedo.speedPulses[0].IsZero() || !speedo.speedPulses[1].IsZero() {
+	if !speedo.speedPulseFrom.IsZero() || !speedo.speedPulseTo.IsZero() {
 		t.Errorf("both times must be zero at start")
 	}
 }
 
 func TestSpeedPulsesPushFirstTime(t *testing.T) {
 	speedo := speedometerDev{
-		speedPulses: getSpeedPulsesZeroValue(),
+		speedPulseFrom: time.Time{},
+		speedPulseTo:   time.Time{},
 	}
 	t1 := time.Now()
 	speedo.pushSpeedPulse(t1)
-	if !speedo.speedPulses[0].IsZero() || speedo.speedPulses[1].UnixNano() != t1.UnixNano() {
+	if !speedo.speedPulseFrom.IsZero() || speedo.speedPulseTo.UnixNano() != t1.UnixNano() {
 		t.Errorf("time[0] must zero and time[1] must be %v", t1)
 	}
 }
 
 func TestSpeedPulsesPushSecondTime(t *testing.T) {
 	speedo := speedometerDev{
-		speedPulses: getSpeedPulsesZeroValue(),
+		speedPulseFrom: time.Time{},
+		speedPulseTo:   time.Time{},
 	}
 	t1 := time.Now().Add(-time.Second)
 	t2 := time.Now()
 	speedo.pushSpeedPulse(t1)
 	speedo.pushSpeedPulse(t2)
-	if speedo.speedPulses[0] != t1 || speedo.speedPulses[1] != t2 {
+	if speedo.speedPulseFrom != t1 || speedo.speedPulseTo != t2 {
 		t.Errorf("time[0] must be %v and time[1] must be %v", t1, t2)
 	}
 }
 
 func TestSpeedPulsesPushThirdTime(t *testing.T) {
 	speedo := speedometerDev{
-		speedPulses: getSpeedPulsesZeroValue(),
+		speedPulseFrom: time.Time{},
+		speedPulseTo:   time.Time{},
 	}
 	t0 := time.Now().Add(-time.Second * 2)
 	t1 := time.Now().Add(-time.Second)
@@ -48,14 +52,15 @@ func TestSpeedPulsesPushThirdTime(t *testing.T) {
 	speedo.pushSpeedPulse(t0)
 	speedo.pushSpeedPulse(t1)
 	speedo.pushSpeedPulse(t2)
-	if speedo.speedPulses[0] != t1 || speedo.speedPulses[1] != t2 {
+	if speedo.speedPulseFrom != t1 || speedo.speedPulseTo != t2 {
 		t.Errorf("time[0] must be %v and time[1] must be %v", t1, t2)
 	}
 }
 
 func TestCalcSpeedNoPulse(t *testing.T) {
 	speedo := speedometerDev{
-		speedPulses: getSpeedPulsesZeroValue(),
+		speedPulseFrom: time.Time{},
+		speedPulseTo:   time.Time{},
 	}
 	speed := speedo.calcSpeed(time.Now())
 	if speed != 0 {
@@ -65,8 +70,9 @@ func TestCalcSpeedNoPulse(t *testing.T) {
 
 func TestCalcSpeedOnePushed(t *testing.T) {
 	speedo := speedometerDev{
-		speedPulses:  getSpeedPulsesZeroValue(),
-		distPerPulse: 0.25,
+		speedPulseFrom: time.Time{},
+		speedPulseTo:   time.Time{},
+		distPerPulse:   0.25,
 	}
 	speedo.pushSpeedPulse(time.Now())
 	speed := speedo.calcSpeed(time.Now())
@@ -77,8 +83,9 @@ func TestCalcSpeedOnePushed(t *testing.T) {
 
 func TestCalcSpeedTwoPushedAndCalculetedBelowPrevDur(t *testing.T) {
 	speedo := speedometerDev{
-		speedPulses:  getSpeedPulsesZeroValue(),
-		distPerPulse: 0.25,
+		speedPulseFrom: time.Time{},
+		speedPulseTo:   time.Time{},
+		distPerPulse:   0.25,
 	}
 	dur := time.Second
 	tr := time.Now()
@@ -95,8 +102,9 @@ func TestCalcSpeedTwoPushedAndCalculetedBelowPrevDur(t *testing.T) {
 
 func TestCalcSpeedTwoPushedAndCalculetedAbovePrevDur(t *testing.T) {
 	speedo := speedometerDev{
-		speedPulses:  getSpeedPulsesZeroValue(),
-		distPerPulse: 0.25,
+		speedPulseFrom: time.Time{},
+		speedPulseTo:   time.Time{},
+		distPerPulse:   0.25,
 	}
 	dur := time.Second
 	tr := time.Now()
