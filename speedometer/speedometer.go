@@ -1,7 +1,6 @@
 package speedometer
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/marksaravi/speedometer-go/dashboard"
@@ -10,7 +9,8 @@ import (
 
 const (
 	DISPLAY_UPDATE_TIMEOUT_MS = 100
-	SPEED_CALC_PERIOD         = time.Second * 5
+	SPEED_UPDATE_TIMEOUT      = time.Millisecond * 1303
+	DIST_UPDATE_TIMEOUT       = time.Millisecond * 2521
 )
 
 func NewSpeedometer() *speedometerDev {
@@ -30,18 +30,26 @@ func NewSpeedometer() *speedometerDev {
 		pulseCounter:      0,
 		prevPulseLevel:    gpio.Low,
 		displayUpdateTurn: 0,
+		speedLastUpdate:   time.Now(),
+		distLastUpdate:    time.Now(),
+		prevSecond:        100,
+		prevMinute:        100,
+		prevHour:          100,
 	}
 	return &speedo
 }
 
 func (s *speedometerDev) Run() {
+	lastUpdate := time.Now()
 	for {
 		if s.readPulse() {
 			s.pushSpeedPulse(time.Now())
-			s.triggerUpdate()
-		}
-		if s.canUpdate() {
 			s.update()
+			lastUpdate = time.Now()
+		}
+		if time.Since(lastUpdate) > time.Millisecond*500 {
+			s.update()
+			lastUpdate = time.Now()
 		}
 		s.readReset()
 	}
@@ -79,21 +87,6 @@ func (s *speedometerDev) readPulse() bool {
 	return pulsed
 }
 
-func (s *speedometerDev) canUpdate() bool {
-	if time.Since(s.displayUpdateTime) < time.Millisecond*DISPLAY_UPDATE_TIMEOUT_MS {
-		return false
-	}
-	s.displayUpdateTime = time.Now()
-	return true
-}
-
-func (s *speedometerDev) triggerUpdate() {
-	const DT = time.Millisecond * DISPLAY_UPDATE_TIMEOUT_MS / 5
-	if time.Since(s.displayUpdateTime) > time.Millisecond*DISPLAY_UPDATE_TIMEOUT_MS-DT {
-		s.displayUpdateTime = time.Now().Add(-time.Millisecond*DISPLAY_UPDATE_TIMEOUT_MS - DT)
-	}
-}
-
 func (s *speedometerDev) calcSpeedDistanceDuration() (
 	seconds, minutes, hours int, speed, distance float64,
 ) {
@@ -109,29 +102,35 @@ func getSecMinHour(d time.Duration) (int, int, int) {
 	return seconds % 60, seconds / 60 % 60, seconds / 3600
 }
 
-func (s *speedometerDev) update() bool {
-	ts := time.Now()
+func (s *speedometerDev) update() {
 	seconds, minutes, hours, speed, distance := s.calcSpeedDistanceDuration()
 
-	switch s.displayUpdateTurn {
-	case 0:
+	if s.prevSecond != seconds {
 		s.lcd.UpdateDuration(seconds, dashboard.SECOND_CHANGED)
-	case 1:
+		s.prevSecond = seconds
+	}
+
+	if s.prevMinute != minutes {
 		s.lcd.UpdateDuration(minutes, dashboard.MINUTE_CHANGED)
-	case 2:
+		s.prevMinute = minutes
+	}
+
+	if s.prevHour != hours {
 		s.lcd.UpdateDuration(hours, dashboard.HOUR_CHANGED)
-	case 3:
+		s.prevHour = hours
+	}
+
+	if time.Since(s.speedLastUpdate) > SPEED_UPDATE_TIMEOUT {
 		s.lcd.UpdateSpeed(speed)
-	case 4:
+		s.speedLastUpdate = time.Now()
+	}
+
+	if time.Since(s.distLastUpdate) >= DIST_UPDATE_TIMEOUT {
 		s.lcd.UpdateDistance(distance)
+		s.distLastUpdate = time.Now()
 	}
-	s.displayUpdateTurn++
-	if s.displayUpdateTurn == 5 {
-		s.displayUpdateTurn = 0
-	}
+
 	s.lcd.UpdateDisplay()
-	fmt.Println(time.Since(ts), ", ", speed)
-	return true
 }
 
 func (s *speedometerDev) pushSpeedPulse(t time.Time) {
