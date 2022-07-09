@@ -25,10 +25,10 @@ func NewSpeedometer() *speedometerDev {
 		distPerPulse:      config.DistancePerPulse,
 		startOfRidingTime: time.Now(),
 		resetPressedTime:  time.Now(),
-		// speedPulses:       getSpeedPulsesZeroValue(),
 		speedPulseFrom:    time.Time{},
 		speedPulseTo:      time.Time{},
 		pulseCounter:      0,
+		prevPulseLevel:    gpio.Low,
 		displayUpdateTurn: 0,
 	}
 	return &speedo
@@ -73,6 +73,7 @@ func (s *speedometerDev) readPulse() bool {
 	level := s.pulsePinIn.Read()
 	if s.prevPulseLevel != level && level == gpio.Low {
 		s.pulseCounter++
+		pulsed = true
 	}
 	s.prevPulseLevel = level
 	return pulsed
@@ -139,6 +140,7 @@ func (s *speedometerDev) pushSpeedPulse(t time.Time) {
 }
 
 func (s *speedometerDev) calcSpeed(t time.Time) float64 {
+	fmt.Println(s.speedPulseFrom.IsZero(), s.speedPulseTo.IsZero())
 	if s.speedPulseFrom.IsZero() {
 		return 0
 	}

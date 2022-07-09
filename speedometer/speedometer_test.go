@@ -3,7 +3,81 @@ package speedometer
 import (
 	"testing"
 	"time"
+
+	"periph.io/x/conn/v3/gpio"
 )
+
+type pulseFake struct {
+	level gpio.Level
+}
+
+func TestReadPulseBothLow(t *testing.T) {
+	pulser := pulseFake{
+		level: gpio.Low,
+	}
+	speedo := speedometerDev{
+		pulsePinIn:     &pulser,
+		prevPulseLevel: gpio.Low,
+		pulseCounter:   0,
+	}
+
+	speedoInitialConditions := []gpio.Level{gpio.Low, gpio.High}
+	pulsePinLevels := []gpio.Level{
+		gpio.Low, gpio.Low, gpio.High, gpio.High,
+		gpio.Low, gpio.Low, gpio.High, gpio.High,
+		gpio.Low, gpio.Low, gpio.High, gpio.High,
+		gpio.Low, gpio.Low, gpio.High, gpio.High,
+	}
+	readWant := [][]bool{
+		{
+			false, false, false, false,
+			true, false, false, false,
+			true, false, false, false,
+			true, false, false, false,
+		},
+		{
+			true, false, false, false,
+			true, false, false, false,
+			true, false, false, false,
+			true, false, false, false,
+		},
+	}
+	countWant := [][]int64{
+		{
+			0, 0, 0, 0,
+			1, 1, 1, 1,
+			2, 2, 2, 2,
+			3, 3, 3, 3,
+		},
+		{
+			1, 1, 1, 1,
+			2, 2, 2, 2,
+			3, 3, 3, 3,
+			4, 4, 4, 4,
+		},
+	}
+
+	for initialLevelIndex := 0; initialLevelIndex < len(speedoInitialConditions); initialLevelIndex++ {
+		speedo.prevPulseLevel = speedoInitialConditions[initialLevelIndex]
+		speedo.pulseCounter = 0
+		for step := 0; step < len(readWant[initialLevelIndex]); step++ {
+			pulser.level = pulsePinLevels[step]
+			pulsed := speedo.readPulse()
+			counter := speedo.pulseCounter
+			if pulsed != readWant[initialLevelIndex][step] ||
+				counter != countWant[initialLevelIndex][step] {
+				t.Errorf("at start level: %v, step: %d, wanted read: %v, counter: %d, but got read: %v, counter: %d",
+					speedoInitialConditions[initialLevelIndex],
+					step,
+					readWant[initialLevelIndex][step],
+					countWant[initialLevelIndex][step],
+					pulsed,
+					counter,
+				)
+			}
+		}
+	}
+}
 
 func TestSpeedPulsesZeroValue(t *testing.T) {
 	speedo := speedometerDev{
@@ -117,4 +191,44 @@ func TestCalcSpeedTwoPushedAndCalculetedAbovePrevDur(t *testing.T) {
 	if speed != speedo.distPerPulse/2.5*3.6 {
 		t.Errorf("speed must be 0.36, got %f", speed)
 	}
+}
+
+func (pulser *pulseFake) In(pull gpio.Pull, edge gpio.Edge) error {
+	return nil
+}
+
+func (pulser *pulseFake) Read() gpio.Level {
+	return pulser.level
+}
+
+func (pulser *pulseFake) WaitForEdge(timeout time.Duration) bool {
+	return false
+}
+
+func (pulser *pulseFake) Pull() gpio.Pull {
+	return gpio.PullDown
+}
+
+func (pulser *pulseFake) DefaultPull() gpio.Pull {
+	return gpio.PullDown
+}
+
+func (pulser *pulseFake) String() string {
+	return ""
+}
+
+func (pulser *pulseFake) Halt() error {
+	return nil
+}
+
+func (pulser *pulseFake) Name() string {
+	return ""
+}
+
+func (pulser *pulseFake) Number() int {
+	return 0
+}
+
+func (pulser *pulseFake) Function() string {
+	return ""
 }
