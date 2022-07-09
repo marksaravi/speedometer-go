@@ -29,8 +29,11 @@ type speedometerDev struct {
 	prevPulseLevel    gpio.Level
 	startOfRidingTime time.Time
 	resetPressedTime  time.Time
-	displayUpdateTime time.Time
-	// speedPulses       [2]time.Time
-	speedPulseFrom time.Time
-	speedPulseTo   time.Time
+	speedPulseFrom    time.Time
+	speedPulseTo      time.Time
+	speedLastUpdate   time.Time
+	distLastUpdate    time.Time
+	prevSecond        int
+	prevMinute        int
+	prevHour          int
 }
