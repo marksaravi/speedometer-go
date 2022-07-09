@@ -15,31 +15,22 @@ type lcdDisplay interface {
 	Initialise()
 	UpdateSpeed(speed float64)
 	UpdateDistance(distance float64)
-	UpdateSecond(second int)
-	UpdateMinute(minute int)
-	UpdateHour(hour int)
+	UpdateDuration(dur, timeType int)
 	UpdateDisplay()
 }
 
 type speedometerDev struct {
-	input gpio.PinIn
-	reset gpio.PinIn
-	lcd   lcdDisplay
-
+	pulsePinIn        gpio.PinIn
+	resetPinIn        gpio.PinIn
+	lcd               lcdDisplay
 	distPerPulse      float64
-	sleepAfterPulseMS int
-	counter           int64
-	startTime         time.Time
-
-	pulse gpio.Level
-
-	resetLevel gpio.Level
-	resetTime  time.Time
-
-	speedPulseStartTime time.Time
-	lastPulse           time.Time
-	speedPulseDur       time.Duration
-	dur                 time.Duration
-	distance            float64
-	speed               float64
+	pulseCounter      int64
+	displayUpdateTurn int
+	prevPulseLevel    gpio.Level
+	startOfRidingTime time.Time
+	resetPressedTime  time.Time
+	displayUpdateTime time.Time
+	// speedPulses       [2]time.Time
+	speedPulseFrom time.Time
+	speedPulseTo   time.Time
 }

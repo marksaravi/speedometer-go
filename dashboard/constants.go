@@ -7,13 +7,20 @@ import (
 
 // basic dimensions
 const (
-	TOP_MARGIN           int = 0
-	LEFT_MARGIN          int = 16
-	SPEED_LINE_HEIGHT    int = 64
-	DISTANCE_LINE_HEIGHT int = 64
-	DURATION_LINE_HEIGHT int = 64
-	LABEL_COLUMN         int = 0
-	DATA_COLUMN          int = 120
+	SEG_HEIGHT            int = 24
+	SEG_WIDTH             int = 32
+	LABEL_X               int = 16
+	LABEL_GAP_M           int = 2 * SEG_HEIGHT
+	SPEED_LABEL_LINE_Y    int = 4*SEG_HEIGHT - 12
+	DISTANCE_LABEL_LINE_Y int = SPEED_LABEL_LINE_Y + LABEL_GAP_M
+	DURATION_LABEL_LINE_Y int = DISTANCE_LABEL_LINE_Y + LABEL_GAP_M
+	DATA_X                int = SEG_WIDTH*4 + 16
+	SPEED_DATA_LINE_Y     int = SPEED_LABEL_LINE_Y + 8
+	DISTANCE_DATA_LINE_Y  int = SPEED_DATA_LINE_Y + LABEL_GAP_M
+	DURATION_DATA_LINE_Y  int = DISTANCE_DATA_LINE_Y + LABEL_GAP_M
+	TIME_DIGIT_WIDTH      int = 36
+	TIME_COLON_WIDTH      int = 14
+	TIME_COLON_OFFSET     int = 4
 )
 
 // Fonts
@@ -29,9 +36,9 @@ var (
 )
 
 const (
-	SECOND_CHANGED TimeChanged = 0
-	MINUTE_CHANGED TimeChanged = 1
-	HOUR_CHANGED   TimeChanged = 2
+	SECOND_CHANGED int = 0
+	MINUTE_CHANGED int = 1
+	HOUR_CHANGED   int = 2
 )
 
 const (

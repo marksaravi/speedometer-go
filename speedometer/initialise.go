@@ -56,7 +56,7 @@ func createSPIConnection(busNumber int, chipSelect int) spi.Conn {
 		chipSelect,
 	)
 	spiConn, err := spibus.Connect(
-		physic.Frequency(12)*physic.MegaHertz,
+		physic.Frequency(48)*physic.MegaHertz,
 		spi.Mode3,
 		8,
 	)

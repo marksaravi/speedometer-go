@@ -9,64 +9,57 @@ func (d *dashboardDisplay) initBackground() {
 	d.display.SetBackgroundColor(d.theme.BackgroungColor)
 	d.display.Clear()
 	d.printLabels()
-	d.printSpeed(0)
-	d.printDistance(0)
+	d.UpdateSpeed(0)
+	d.UpdateDistance(0)
 	d.printDurationColons()
-	d.printDurationDigits(0, SECOND_CHANGED)
-	d.printDurationDigits(0, MINUTE_CHANGED)
-	d.printDurationDigits(0, HOUR_CHANGED)
+	d.UpdateDuration(0, SECOND_CHANGED)
+	d.UpdateDuration(0, MINUTE_CHANGED)
+	d.UpdateDuration(0, HOUR_CHANGED)
+	d.drawGrids()
 	d.display.Update()
 }
 
-func (d *dashboardDisplay) setFont(font fonts.BitmapFont, color colors.Color, lineHeight int, x, y int) {
+func (d *dashboardDisplay) setTextSettings(font fonts.BitmapFont, color colors.Color, x, y int) {
 	d.display.SetColor(color)
 	d.display.SetFont(font)
-	d.display.SetLineHeight(lineHeight)
 	d.display.MoveCursor(x, y)
 }
 
-func (d *dashboardDisplay) printLabels() {
-	d.setFont(
-		SPEED_LABEL_FONT,
-		d.theme.SpeedLabelColor,
-		SPEED_LINE_HEIGHT,
-		LEFT_MARGIN+LABEL_COLUMN,
-		TOP_MARGIN,
-	)
-	d.display.Write("Speed (km/h):")
-	d.setFont(
-		DISTANCE_LABEL_FONT,
-		d.theme.DistanceLabelColor,
-		DISTANCE_LINE_HEIGHT,
-		LEFT_MARGIN+LABEL_COLUMN,
-		TOP_MARGIN+SPEED_LINE_HEIGHT,
-	)
-	d.display.Write("Distance (km):")
-	d.setFont(
-		DURATION_LABEL_FONT,
-		d.theme.DurationLabelColor,
-		DURATION_LINE_HEIGHT,
-		LEFT_MARGIN+LABEL_COLUMN,
-		TOP_MARGIN+SPEED_LINE_HEIGHT+DISTANCE_LINE_HEIGHT,
-	)
-	d.display.Write("Duration:")
+func (d *dashboardDisplay) writeText(text string, font fonts.BitmapFont, color colors.Color, x, y int) {
+	d.setTextSettings(font, color, x, y)
+	d.display.Write(text)
 }
 
-func (d *dashboardDisplay) printDurationColons() {
-	drawDigit := func(x, y int) {
-		d.display.MoveCursor(x+DIGIT_WIDTH+4, y)
-		d.display.Write(":")
-	}
-	x := LEFT_MARGIN + DATA_COLUMN
-	y := TOP_MARGIN + SPEED_LINE_HEIGHT + DISTANCE_LINE_HEIGHT
-	d.setFont(
-		DURATION_DATA_FONT,
-		d.theme.DurationDataColor,
-		DURATION_LINE_HEIGHT,
-		x,
-		y,
+func (d *dashboardDisplay) printLabels() {
+	d.writeText(
+		"Speed (km/h):",
+		SPEED_LABEL_FONT,
+		d.theme.SpeedLabelColor,
+		LABEL_X,
+		SPEED_LABEL_LINE_Y,
 	)
-	drawDigit(x, y)
-	x += DIGIT_WIDTH + COLON_WIDTH
-	drawDigit(x, y)
+	d.writeText(
+		"Distance (km):",
+		DISTANCE_LABEL_FONT,
+		d.theme.DistanceLabelColor,
+		LABEL_X,
+		DISTANCE_LABEL_LINE_Y,
+	)
+	d.writeText(
+		"Duration:",
+		DURATION_LABEL_FONT,
+		d.theme.DurationLabelColor,
+		LABEL_X,
+		DURATION_LABEL_LINE_Y,
+	)
+}
+
+func (d *dashboardDisplay) drawGrids() {
+	d.display.SetColor(colors.LIGHTGRAY)
+	for x := float64(32); x < 319; x += 32 {
+		d.display.Line(x, 0, x, 239)
+	}
+	for y := float64(24); y < 239; y += 24 {
+		d.display.Line(0, y, 319, y)
+	}
 }

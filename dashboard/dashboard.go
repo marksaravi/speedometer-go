@@ -1,23 +1,22 @@
 package dashboard
 
 import (
+	"fmt"
+
+	"github.com/marksaravi/devices-go/colors"
 	"github.com/marksaravi/devices-go/devices/display"
+	"github.com/marksaravi/fonts-go/fonts"
 )
 
-type TimeChanged = int
 type dashboardDisplay struct {
-	display  display.RGBDisplay
-	speed    float64 // km/hour
-	distance float64 // meter
-	theme    Theme
+	display display.RGBDisplay
+	theme   Theme
 }
 
 func NewDashboardDisplay(display display.RGBDisplay) *dashboardDisplay {
 	return &dashboardDisplay{
-		display:  display,
-		speed:    0,
-		distance: 0,
-		theme:    DarkTheme,
+		display: display,
+		theme:   DarkTheme,
 	}
 }
 
@@ -26,25 +25,71 @@ func (d *dashboardDisplay) Initialise() {
 }
 
 func (d *dashboardDisplay) UpdateSpeed(speed float64) {
-	d.printSpeed(speed)
+	x := DATA_X
+	y := SPEED_DATA_LINE_Y
+	d.printDigits(fmt.Sprintf("%3.1f", speed), SPEED_DATA_FONT, d.theme.SpeedDataColor, x, y)
 }
 
 func (d *dashboardDisplay) UpdateDistance(distance float64) {
-	d.printDistance(distance)
+	x := DATA_X
+	y := DISTANCE_DATA_LINE_Y
+	d.printDigits(fmt.Sprintf("%4.2f", distance/1000), DISTANCE_DATA_FONT, d.theme.DistanceDataColor, x, y)
 }
 
-func (d *dashboardDisplay) UpdateSecond(seconds int) {
-	d.printDurationDigits(seconds, SECOND_CHANGED)
-}
-
-func (d *dashboardDisplay) UpdateMinute(minutes int) {
-	d.printDurationDigits(minutes, MINUTE_CHANGED)
-}
-
-func (d *dashboardDisplay) UpdateHour(hours int) {
-	d.printDurationDigits(hours, HOUR_CHANGED)
+func (d *dashboardDisplay) UpdateDuration(t int, change int) {
+	digits := fmt.Sprintf("%02d", t)
+	x := DATA_X
+	y := DURATION_DATA_LINE_Y
+	DIGIT_OFFSET := TIME_DIGIT_WIDTH + TIME_COLON_WIDTH
+	if change == MINUTE_CHANGED {
+		x += DIGIT_OFFSET
+	}
+	if change == SECOND_CHANGED {
+		x += 2 * DIGIT_OFFSET
+	}
+	d.printDigits(digits, DURATION_DATA_FONT, d.theme.DurationDataColor, x, y)
 }
 
 func (d *dashboardDisplay) UpdateDisplay() {
 	d.display.Update()
+}
+
+func (d *dashboardDisplay) printDigits(digits string, font fonts.BitmapFont, color colors.Color, x, y int) {
+	d.setTextSettings(font, color, x, y)
+	x1, y1, x2, y2 := d.display.GetTextArea(digits)
+	d.display.ClearArea(float64(x+x1), float64(y+y1), float64(x+x2), float64(y+y2))
+	d.display.Write(digits)
+}
+
+func (d *dashboardDisplay) printDurationDigits(t int, change int) {
+	digits := fmt.Sprintf("%02d", t)
+	x := DATA_X
+	y := DURATION_DATA_LINE_Y
+	DIGIT_OFFSET := TIME_DIGIT_WIDTH + TIME_COLON_WIDTH
+	if change == MINUTE_CHANGED {
+		x += DIGIT_OFFSET
+	}
+	if change == SECOND_CHANGED {
+		x += 2 * DIGIT_OFFSET
+	}
+	d.printDigits(digits, DURATION_DATA_FONT, d.theme.DurationDataColor, x, y)
+}
+
+func (d *dashboardDisplay) printDurationColons() {
+	x := DATA_X + TIME_DIGIT_WIDTH + TIME_COLON_OFFSET
+	y := DURATION_DATA_LINE_Y
+	d.writeText(
+		":",
+		DURATION_DATA_FONT,
+		d.theme.DurationDataColor,
+		x,
+		y,
+	)
+	d.writeText(
+		":",
+		DURATION_DATA_FONT,
+		d.theme.DurationDataColor,
+		x+TIME_DIGIT_WIDTH+TIME_COLON_WIDTH,
+		y,
+	)
 }
