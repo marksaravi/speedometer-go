@@ -140,15 +140,21 @@ func (s *speedometerDev) pushSpeedPulse(t time.Time) {
 }
 
 func (s *speedometerDev) calcSpeed(t time.Time) float64 {
-	fmt.Println(s.speedPulseFrom.IsZero(), s.speedPulseTo.IsZero())
 	if s.speedPulseFrom.IsZero() {
 		return 0
 	}
+
 	durToT1T0 := s.speedPulseTo.Sub(s.speedPulseFrom)
 	durToT1 := t.Sub(s.speedPulseTo)
 	dur := durToT1T0
 	if durToT1 > durToT1T0 {
 		dur = t.Sub(s.speedPulseFrom)
 	}
-	return s.distPerPulse * 1000000 / float64(dur.Microseconds()) * 3.6
+
+	var speed float64 = 0
+	if dur > time.Second*5 {
+		return speed
+	}
+	speed = s.distPerPulse * 1000000 / float64(dur.Microseconds()) * 3.6
+	return speed
 }
