@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	gpiodev "github.com/marksaravi/devices-go/hardware/gpio"
+	spidev "github.com/marksaravi/devices-go/hardware/spi"
 	"github.com/marksaravi/speedometer-go/speedometer"
 	"periph.io/x/conn/v3/gpio"
 	"periph.io/x/conn/v3/gpio/gpioreg"
@@ -31,16 +33,34 @@ func main() {
 	speedo.Run()
 }
 
-func createGpioOutPin(gpioPinNum string) gpio.PinOut {
+type pinOut struct {
+	pin gpio.PinOut
+}
+
+func (p *pinOut) Out(level gpiodev.Level) {
+	p.pin.Out(gpio.Level(level))
+}
+
+func createGpioOutPin(gpioPinNum string) gpiodev.GPIOPinOut {
 	var pin gpio.PinOut = gpioreg.ByName(gpioPinNum)
 	if pin == nil {
 		checkFatalErr(fmt.Errorf("failed to create GPIO pin %s", gpioPinNum))
 	}
 	pin.Out(gpio.Low)
-	return pin
+	return &pinOut{
+		pin: pin,
+	}
 }
 
-func createGpioInputPin(gpioPinNum string) gpio.PinIn {
+type pinIn struct {
+	pin gpio.PinIn
+}
+
+func (p *pinIn) Read() gpiodev.Level {
+	return gpiodev.Level(p.pin.Read())
+}
+
+func createGpioInputPin(gpioPinNum string) gpiodev.GPIOPinIn {
 	var pin gpio.PinIn = gpioreg.ByName(gpioPinNum)
 	if pin == nil {
 		log.Fatal(fmt.Errorf("failed to create GPIO pin %s", gpioPinNum))
@@ -48,10 +68,12 @@ func createGpioInputPin(gpioPinNum string) gpio.PinIn {
 	if err := pin.In(gpio.PullDown, gpio.RisingEdge); err != nil {
 		log.Fatal(err)
 	}
-	return pin
+	return &pinIn{
+		pin: pin,
+	}
 }
 
-func createSPIConnection(busNumber int, chipSelect int) spi.Conn {
+func createSPIConnection(busNumber int, chipSelect int) spidev.SPI {
 	spibus, _ := sysfs.NewSPI(
 		busNumber,
 		chipSelect,

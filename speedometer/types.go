@@ -3,7 +3,7 @@ package speedometer
 import (
 	"time"
 
-	"periph.io/x/conn/v3/gpio"
+	"github.com/marksaravi/devices-go/hardware/gpio"
 )
 
 type Config struct {
@@ -20,8 +20,8 @@ type lcdDisplay interface {
 }
 
 type speedometerDev struct {
-	pulsePinIn        gpio.PinIn
-	resetPinIn        gpio.PinIn
+	pulsePinIn        gpio.GPIOPinIn
+	resetPinIn        gpio.GPIOPinIn
 	lcd               lcdDisplay
 	distPerPulse      float64
 	pulseCounter      int64

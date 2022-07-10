@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"periph.io/x/conn/v3/gpio"
+	"github.com/marksaravi/devices-go/hardware/gpio"
 )
 
 type pulseFake struct {
@@ -193,42 +193,6 @@ func TestCalcSpeedTwoPushedAndCalculetedAbovePrevDur(t *testing.T) {
 	}
 }
 
-func (pulser *pulseFake) In(pull gpio.Pull, edge gpio.Edge) error {
-	return nil
-}
-
 func (pulser *pulseFake) Read() gpio.Level {
 	return pulser.level
-}
-
-func (pulser *pulseFake) WaitForEdge(timeout time.Duration) bool {
-	return false
-}
-
-func (pulser *pulseFake) Pull() gpio.Pull {
-	return gpio.PullDown
-}
-
-func (pulser *pulseFake) DefaultPull() gpio.Pull {
-	return gpio.PullDown
-}
-
-func (pulser *pulseFake) String() string {
-	return ""
-}
-
-func (pulser *pulseFake) Halt() error {
-	return nil
-}
-
-func (pulser *pulseFake) Name() string {
-	return ""
-}
-
-func (pulser *pulseFake) Number() int {
-	return 0
-}
-
-func (pulser *pulseFake) Function() string {
-	return ""
 }

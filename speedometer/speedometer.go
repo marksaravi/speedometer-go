@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/marksaravi/devices-go/devices/display"
+	"github.com/marksaravi/devices-go/hardware/gpio"
 	"github.com/marksaravi/devices-go/hardware/ili9341"
+	"github.com/marksaravi/devices-go/hardware/spi"
 	"github.com/marksaravi/speedometer-go/dashboard"
-	"periph.io/x/conn/v3/gpio"
-	"periph.io/x/conn/v3/spi"
 )
 
 const (
@@ -19,7 +19,7 @@ const (
 	DIST_UPDATE_TIMEOUT       = time.Millisecond * 2521
 )
 
-func NewSpeedometer(speedPulsePin, speedResetPin gpio.PinIn, spiConn spi.Conn, dataCommandSelect gpio.PinOut, reset gpio.PinOut) *speedometerDev {
+func NewSpeedometer(speedPulsePin, speedResetPin gpio.GPIOPinIn, spiConn spi.SPI, dataCommandSelect gpio.GPIOPinOut, reset gpio.GPIOPinOut) *speedometerDev {
 	config := ReadConfigs()
 	lcd := createDisplay(spiConn, dataCommandSelect, reset)
 	lcd.Initialise()
@@ -164,7 +164,7 @@ func (s *speedometerDev) calcSpeed(t time.Time) float64 {
 	return speed
 }
 
-func createDisplay(spiConn spi.Conn, dataCommandSelect, reset gpio.PinOut) lcdDisplay {
+func createDisplay(spiConn spi.SPI, dataCommandSelect, reset gpio.GPIOPinOut) lcdDisplay {
 
 	ili9341Dev, err := ili9341.NewILI9341(spiConn, dataCommandSelect, reset)
 	ili9341Display := display.NewRGBDisplay(ili9341Dev)
