@@ -1,10 +1,16 @@
 package speedometer
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
 	"time"
 
+	"github.com/marksaravi/devices-go/devices/display"
+	"github.com/marksaravi/devices-go/hardware/ili9341"
 	"github.com/marksaravi/speedometer-go/dashboard"
 	"periph.io/x/conn/v3/gpio"
+	"periph.io/x/conn/v3/spi"
 )
 
 const (
@@ -13,14 +19,14 @@ const (
 	DIST_UPDATE_TIMEOUT       = time.Millisecond * 2521
 )
 
-func NewSpeedometer() *speedometerDev {
+func NewSpeedometer(speedPulsePin, speedResetPin gpio.PinIn, spiConn spi.Conn, dataCommandSelect gpio.PinOut, reset gpio.PinOut) *speedometerDev {
 	config := ReadConfigs()
-	lcd := createDisplay()
+	lcd := createDisplay(spiConn, dataCommandSelect, reset)
 	lcd.Initialise()
 
 	speedo := speedometerDev{
-		pulsePinIn:        createGpioInputPin("GPIO14"),
-		resetPinIn:        createGpioInputPin("GPIO15"),
+		pulsePinIn:        speedPulsePin,
+		resetPinIn:        speedResetPin,
 		lcd:               lcd,
 		distPerPulse:      config.DistancePerPulse,
 		startOfRidingTime: time.Now(),
@@ -156,4 +162,29 @@ func (s *speedometerDev) calcSpeed(t time.Time) float64 {
 	}
 	speed = s.distPerPulse * 1000000 / float64(dur.Microseconds()) * 3.6
 	return speed
+}
+
+func createDisplay(spiConn spi.Conn, dataCommandSelect, reset gpio.PinOut) lcdDisplay {
+
+	ili9341Dev, err := ili9341.NewILI9341(spiConn, dataCommandSelect, reset)
+	ili9341Display := display.NewRGBDisplay(ili9341Dev)
+	checkFatalErr(err)
+	checkFatalErr(err)
+	return dashboard.NewDashboardDisplay(ili9341Display)
+}
+
+func checkFatalErr(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ReadConfigs() Config {
+	content, err := ioutil.ReadFile("./config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	var configs Config
+	json.Unmarshal([]byte(content), &configs)
+	return configs
 }
