@@ -1,0 +1,1 @@
+dtoverlay=spi1-1cs
