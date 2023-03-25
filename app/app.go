@@ -3,8 +3,9 @@ package app
 import (
 	"context"
 	"log"
-	"speedometer-go/touch"
 	"time"
+
+	"github.com/marksaravi/speedometer-go/models"
 )
 
 type iDisplay interface {
@@ -20,7 +21,7 @@ type iSpeedProcessor interface {
 }
 
 type iTouch interface {
-	Touched() <-chan touch.XY
+	Touched() <-chan models.XY
 }
 
 type speedoApp struct {
