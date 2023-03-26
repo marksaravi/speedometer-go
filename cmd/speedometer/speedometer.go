@@ -28,10 +28,10 @@ func main() {
 	var wg sync.WaitGroup
 	speeds := speedprocessor.NewSpeedSensor()
 	touchSpi := spi.NewSPI(0, 0, spi.Mode0, 11, 8)
-	xpt2046, err := xpt2046.NewXPT2046(ctx, &wg, touchSpi)
+	xpt2046, err := xpt2046.NewXPT2046(ctx, &wg, touchSpi, 20)
 	checkFatal(err)
 	touch := touch.NewTouch(xpt2046.TouchChannel)
-	lcdSpi := spi.NewSPI(1, 0, spi.Mode0, 64, 8)
+	lcdSpi := spi.NewSPI(1, 0, spi.Mode2, 64, 8)
 	dc := gpio.NewGPIOOut("GPIO22")
 	reset := gpio.NewGPIOOut("GPIO23")
 	ili9341, err := ili9341.NewILI9341(ili9341.LCD_320x200, lcdSpi, dc, reset)
