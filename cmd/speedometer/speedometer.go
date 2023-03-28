@@ -10,6 +10,7 @@ import (
 	"github.com/marksaravi/speedometer-go/app"
 	"github.com/marksaravi/speedometer-go/display"
 	"github.com/marksaravi/speedometer-go/speedprocessor"
+	"github.com/marksaravi/speedometer-go/themes"
 	"github.com/marksaravi/speedometer-go/touch"
 	"periph.io/x/host/v3"
 
@@ -37,7 +38,7 @@ func main() {
 	ili9341, err := ili9341.NewILI9341(ili9341.LCD_320x200, lcdSpi, dc, reset)
 	checkFatal(err)
 	skecher := drawings.NewSketcher(ili9341, colors.BLACK)
-	dis := display.NewDisplay(skecher)
+	dis := display.NewDisplay(themes.Default, skecher, 4)
 	app := app.NewSpeedoApp(dis, speeds, touch)
 
 	go func() {
