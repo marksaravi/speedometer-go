@@ -2,6 +2,8 @@ github.com/jonboulle/clockwork v0.2.2 h1:UOGuzwb1PwsrDAObMuhUnj0p5ULPj8V/xJ7Kx9q
 github.com/jonboulle/clockwork v0.2.2/go.mod h1:Pkfl5aHPm1nk2H9h0bjmnJD/BcgbGXUBGnn1kMkgxc8=
 github.com/marksaravi/drawings-go v1.0.1 h1:AizNJWcKif6czfEJqhFoUamVGsk7FNsYlQd9Ks8vJhU=
 github.com/marksaravi/drawings-go v1.0.1/go.mod h1:v4tzkmVQyrCnA4tnZ8+eiaicQM1oVLV6nM64Pt/qFT4=
+github.com/marksaravi/drawings-go v1.0.2 h1:oGRahC1XqIxO3ZsKAssc6Goc4hJUB+W4i6m5i5LeWMY=
+github.com/marksaravi/drawings-go v1.0.2/go.mod h1:v4tzkmVQyrCnA4tnZ8+eiaicQM1oVLV6nM64Pt/qFT4=
 github.com/marksaravi/drivers-go v1.0.3 h1:/eWyZ5BoKGYFxXQAB+TIl8Gdy9ff0LTRqEa2X3VyenU=
 github.com/marksaravi/drivers-go v1.0.3/go.mod h1:S6kzovbZrA9nvjI9grM1oTdRG+/OjDy4H//TwYbhKjI=
 github.com/marksaravi/drivers-go v1.0.4 h1:eDYCHYty8eKvtQ3GQ9wfOhNjhx6Vbd75OVrwBn1bwvI=

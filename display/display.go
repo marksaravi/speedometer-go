@@ -1,6 +1,7 @@
 package display
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -19,7 +20,7 @@ type display struct {
 
 func NewDisplay(theme themes.Theme, sketcher drawings.Sketcher, margin float64) *display {
 	resetChannel := make(chan bool)
-
+	sketcher.SetRotation(drawings.ROTATION_270)
 	return &display{
 		theme:        theme,
 		resetChannel: resetChannel,
@@ -34,8 +35,15 @@ func NewDisplay(theme themes.Theme, sketcher drawings.Sketcher, margin float64) 
 func (d *display) Initialize() {
 	d.sketcher.Clear(colors.BLACK)
 	d.sketcher.ClearArea(d.xs, d.ys, d.xs+d.width, d.ys+d.height, d.theme.BackgroungColor)
-	d.write("12.3", fonts.FreeSans24pt7b, d.theme.SpeedColor, d.xs+10, d.ys+100)
-	d.sketcher.Update()
+	// go func() {
+	// 	s1 := rand.NewSource(time.Now().UnixNano())
+	// 	r1 := rand.New(s1)
+	// 	for {
+	// 		d.writeSpeed(r1.Float64() * 100)
+	// 		d.sketcher.Update()
+	// 		time.Sleep(time.Second)
+	// 	}
+	// }()
 }
 
 func (d *display) Update(speed float64, distance float64, duration time.Duration) {}
@@ -48,9 +56,19 @@ func (d *display) ResetChannel() <-chan bool {
 	return d.resetChannel
 }
 
-func (d *display) write(text string, font fonts.BitmapFont, color colors.Color, x, y float64) {
-	// x1, y1, x2, y2 := d.sketcher.GetTextArea(text)
+func (d *display) write(text string, font fonts.BitmapFont, color colors.Color, x, y int, xscale, yscale int) {
 	d.sketcher.SetFont(font)
-	d.sketcher.MoveCursor(int(x), int(y))
+	x1, y1, x2, y2 := d.sketcher.GetTextArea(x, y, text, xscale, yscale)
+	d.sketcher.ClearArea(float64(x1), float64(y1), float64(x2), float64(y2), d.theme.BackgroungColor)
+	d.sketcher.MoveCursor(x, y)
 	d.sketcher.Write(text, color)
+}
+
+func (d *display) writeSpeed(speed float64) {
+	const x float64 = 20
+	const y float64 = 120
+	const xScale = 1
+	const yScale = 1
+
+	d.write(fmt.Sprintf("%0.1f", speed), fonts.FreeSans24pt7b, d.theme.SpeedColor, int(d.xs+x), int(d.ys+y), xScale, yScale)
 }
