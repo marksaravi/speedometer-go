@@ -3,7 +3,7 @@ module github.com/marksaravi/speedometer-go
 go 1.20
 
 require (
-	github.com/marksaravi/drawings-go v1.0.2
+	github.com/marksaravi/drawings-go v1.0.5
 	github.com/marksaravi/drivers-go v1.0.5
 	periph.io/x/host/v3 v3.7.2
 )
