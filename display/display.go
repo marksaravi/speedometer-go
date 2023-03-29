@@ -3,7 +3,6 @@ package display
 import (
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/marksaravi/drawings-go/drawings"
 	"github.com/marksaravi/drivers-go/colors"
@@ -55,8 +54,6 @@ func (d *display) Initialize() {
 	// 	}
 	// }()
 }
-
-func (d *display) Update(speed float64, distance float64, duration time.Duration) {}
 
 func (d *display) Touched(x, y float64) {
 	log.Printf("TOUCH: %f,%f\n", x, y)
