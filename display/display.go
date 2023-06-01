@@ -28,7 +28,7 @@ type display struct {
 
 func NewDisplay(theme themes.Theme, sketcher drawings.Sketcher, margin float64) *display {
 	resetChannel := make(chan bool)
-	sketcher.SetRotation(drawings.ROTATION_270)
+	sketcher.SetRotation(drawings.ROTATION_90)
 	return &display{
 		theme:        theme,
 		resetChannel: resetChannel,
@@ -44,6 +44,7 @@ func (d *display) Initialize() {
 	d.sketcher.Clear(colors.BLACK)
 	d.sketcher.ClearArea(d.xs, d.ys, d.xs+d.width, d.ys+d.height, d.theme.BackgroungColor)
 	d.writeLabels()
+	d.calibrationPoints()
 	d.sketcher.Update()
 	go func() {
 		s1 := rand.NewSource(time.Now().UnixNano())
@@ -129,4 +130,16 @@ func (d *display) write(text string, font fonts.BitmapFont, color colors.Color, 
 	d.sketcher.MoveCursor(x, y)
 	d.sketcher.WriteScaled(text, xScale, yScale, d.theme.SpeedColor)
 	return a
+}
+
+func (d *display) calibrationPoints() {
+	var PADDING float64 = 25
+	w := d.sketcher.ScreenWidth()
+	h := d.sketcher.ScreenHeight()
+	d.sketcher.FillCircle(PADDING, PADDING, float64(5), colors.RED)
+	d.sketcher.FillCircle(w-PADDING, PADDING, float64(5), colors.RED)
+	d.sketcher.FillCircle(PADDING, h-PADDING, float64(5), colors.RED)
+	d.sketcher.FillCircle(w-PADDING, h-PADDING, float64(5), colors.RED)
+	fmt.Printf("(%5.0f,%5.0f),(%5.0f,%5.0f),(%5.0f,%5.0f),(%5.0f,%5.0f)",
+		PADDING, PADDING, w-PADDING, PADDING, PADDING, h-PADDING, w-PADDING, h-PADDING)
 }
