@@ -10,7 +10,6 @@ import (
 
 type iDisplay interface {
 	Initialize()
-	Update(speed float64, distance float64, duration time.Duration)
 	Touched(x, y float64)
 	ResetChannel() <-chan bool
 }
@@ -55,7 +54,7 @@ func (a *speedoApp) Start(ctx context.Context) {
 		default:
 			updated, speed, distance, duration := a.speeds.Update()
 			if updated {
-				a.display.Update(speed, distance, duration)
+				log.Println(speed, distance, duration)
 			}
 		}
 	}
