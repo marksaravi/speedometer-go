@@ -3,7 +3,6 @@ package display
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"time"
 
 	"github.com/marksaravi/drawings-go/drawings"
@@ -45,16 +44,22 @@ func (d *display) Initialize() {
 	d.sketcher.ClearArea(d.xs, d.ys, d.xs+d.width, d.ys+d.height, d.theme.BackgroungColor)
 	d.writeLabels()
 	d.calibrationPoints()
+	d.writeSpeed(0)
 	d.sketcher.Update()
-	go func() {
-		s1 := rand.NewSource(time.Now().UnixNano())
-		r1 := rand.New(s1)
-		for {
-			d.writeSpeed(r1.Float64() * 100)
-			d.sketcher.Update()
-			time.Sleep(time.Second)
-		}
-	}()
+	// go func() {
+	// 	s1 := rand.NewSource(time.Now().UnixNano())
+	// 	r1 := rand.New(s1)
+	// 	for {
+	// 		d.writeSpeed(r1.Float64() * 100)
+	// 		d.sketcher.Update()
+	// 		time.Sleep(time.Second)
+	// 	}
+	// }()
+}
+
+func (d *display)SetInfo(speed float64, distance float64, duration time.Duration) {
+	d.writeSpeed(speed)
+	d.sketcher.Update()
 }
 
 func (d *display) Touched(x, y float64) {

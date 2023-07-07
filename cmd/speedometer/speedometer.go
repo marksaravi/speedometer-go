@@ -9,9 +9,9 @@ import (
 	"github.com/marksaravi/drawings-go/drawings"
 	"github.com/marksaravi/speedometer-go/app"
 	"github.com/marksaravi/speedometer-go/display"
-	"github.com/marksaravi/speedometer-go/speedprocessor"
 	"github.com/marksaravi/speedometer-go/themes"
 	"github.com/marksaravi/speedometer-go/touch"
+	"github.com/marksaravi/speedometer-go/pulsesensor"
 	"periph.io/x/host/v3"
 
 	"github.com/marksaravi/drivers-go/colors"
@@ -27,7 +27,6 @@ func main() {
 	log.Println("Starting Speedometer")
 	ctx, cancel := context.WithCancel(context.Background())
 	var wg sync.WaitGroup
-	speeds := speedprocessor.NewSpeedSensor()
 	touchSpi := spi.NewSPI(0, 0, spi.Mode0, 11, 8)
 	xpt2046, err := xpt2046.NewXPT2046(ctx, &wg, touchSpi, 20)
 	checkFatal(err)
@@ -35,11 +34,13 @@ func main() {
 	lcdSpi := spi.NewSPI(1, 0, spi.Mode2, 64, 8)
 	dc := gpio.NewGPIOOut("GPIO22")
 	reset := gpio.NewGPIOOut("GPIO23")
+	ps := gpio.NewGPIOIn("GPIO23")
 	ili9341, err := ili9341.NewILI9341(ili9341.LCD_320x200, lcdSpi, dc, reset)
 	checkFatal(err)
 	skecher := drawings.NewSketcher(ili9341, colors.BLACK)
 	dis := display.NewDisplay(themes.Default, skecher, 4)
-	app := app.NewSpeedoApp(dis, speeds, touch)
+	pulse := pulsesensor.NewPulseSensor(ps)
+	app := app.NewSpeedoApp(dis, pulse, touch)
 
 	go func() {
 		fmt.Println("press ENTER to stop")
