@@ -66,7 +66,7 @@ func (a *speedoApp) Start(ctx context.Context) {
 				speed, distance, duration := a.calcSpeed(dur)
 				if time.Since(lastDisplay)>=time.Second {
 					a.display.SetInfo(speed, distance, duration)
-					log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
+					// log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
 					lastDisplay = time.Now()
 				}
 			}

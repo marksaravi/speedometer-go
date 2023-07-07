@@ -51,7 +51,7 @@ func (d *display) Initialize() {
 func (d *display)SetInfo(speed float64, distance float64, duration time.Duration) {
 	d.writeSpeed(speed)
 	d.writeDistance(distance)
-	d.writeDuration(duration)
+	// d.writeDuration(duration)
 	d.sketcher.Update()
 }
 
