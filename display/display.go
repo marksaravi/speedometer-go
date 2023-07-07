@@ -3,6 +3,7 @@ package display
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/marksaravi/drawings-go/drawings"
 	"github.com/marksaravi/drivers-go/colors"
@@ -56,7 +57,7 @@ func (d *display) Initialize() {
 	// }()
 }
 
-func (d *display)SetSpeed(speed float64) {
+func (d *display)SetInfo(speed float64, distance float64, duration time.Duration) {
 	d.writeSpeed(speed)
 	d.sketcher.Update()
 }

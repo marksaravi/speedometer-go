@@ -6,35 +6,22 @@ import (
 )
 
 type pulseSensor struct {
+	lastRead   time.Time
 	pulseInput gpio.GPIOPinIn
 }
 
 func NewPulseSensor(pulseInput gpio.GPIOPinIn) *pulseSensor {
 	return &pulseSensor {
 		pulseInput: pulseInput,
+		lastRead: time.Now().Add(-time.Second*86400),
 	}
 }
 
-
-const MID_DUR time.Duration = time.Second/30
-const MAX_DUR = MID_DUR + MID_DUR/4
-const MIN_DUR = MID_DUR - MID_DUR/4
-var  lastRead time.Time= time.Now()
-var dur = MID_DUR
-var dt time.Duration = MID_DUR/400
-
-func mock() bool {
-	if dur >= MAX_DUR || dur <= MIN_DUR {
-		dt = -dt
+func (s *pulseSensor) Read() (bool, time.Duration) {
+	dur := time.Since(s.lastRead)
+	if dur >= time.Second/40 {
+		s.lastRead = time.Now()
+		return true, dur 
 	}
-	if time.Since(lastRead) >= dur {
-		lastRead = time.Now()
-		dur += dt
-		return true
-	}
-	return false
-}
-
-func (s *pulseSensor) Read() bool {
-	return mock()
+	return false, dur
 }

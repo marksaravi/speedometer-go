@@ -12,13 +12,13 @@ const DUR_BUFF_LEN = 20
 
 type display interface {
 	Initialize()
-	SetSpeed(speed float64)
+	SetInfo(speed float64, distance float64, duration time.Duration)
 	Touched(x, y float64)
 	ResetChannel() <-chan bool
 }
 
 type pulseSensor interface {
-	Read() bool
+	Read() (bool, time.Duration)
 }
 
 type touchSensor interface {
@@ -30,10 +30,9 @@ type speedoApp struct {
 	pulse   pulseSensor
 	touch   touchSensor
 
-	lastRead time.Time
-	dts      []time.Duration
-	pulses   int64
-	duration time.Duration
+	durations       []time.Duration
+	pulses    int64
+	startTime time.Time
 }
 
 func NewSpeedoApp(display display, pulse pulseSensor, touch touchSensor) *speedoApp {
@@ -49,7 +48,7 @@ func (a *speedoApp) Start(ctx context.Context) {
 
 	a.display.Initialize()
 	a.Reset()
-
+	lastDisplay := time.Now()
 	for {
 		select {
 		case <-ctx.Done():
@@ -58,23 +57,35 @@ func (a *speedoApp) Start(ctx context.Context) {
 		case xy := <-a.touch.Touched():
 			a.display.Touched(xy.X, xy.Y)
 		default:
-			if a.pulse.Read() {
-				a.lastRead = time.Now()
-				// log.Println(speed, distance, duration)
-				a.display.SetSpeed(0)
+			ok, dur := a.pulse.Read()
+			if ok {
+				speed, distance, duration := a.calcSpeed(dur)
+				if time.Since(lastDisplay)>=time.Second {
+					a.display.SetInfo(speed, distance, duration)
+					log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
+					lastDisplay = time.Now()
+				}
 			}
 		}
 	}
 }
 
 func (a *speedoApp) Reset() {
-	a.lastRead = time.Now().Add(time.Second*1000000)
-	a.dts = make([]time.Duration, 0, DUR_BUFF_LEN)
+	a.durations = make([]time.Duration, DUR_BUFF_LEN)
+	for i:=0; i<DUR_BUFF_LEN; i++ {
+		a.durations[i]=time.Second*86400
+	}
+	a.startTime = time.Now()
 }
 
-func (a *speedoApp) bufferPulse() {
-	dt:=time.Since(a.lastRead)
-	a.dts[0]=dt
-	a.lastRead = time.Now()
-	a.dts = make([]time.Duration, 0, DUR_BUFF_LEN)
+func (a *speedoApp) calcSpeed(dur time.Duration) (speed, distance float64, duration time.Duration) {
+	for i:=1; i<DUR_BUFF_LEN; i++ {
+		a.durations[i]=a.durations[i-1]
+	}
+	a.durations[0]=dur
+	a.pulses++
+	speed = float64(0.28)/dur.Seconds()
+	distance = float64(a.pulses)*float64(0.28)/1000
+	duration = time.Since(a.startTime)
+	return
 }
