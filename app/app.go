@@ -89,7 +89,7 @@ func (a *speedoApp) calcSpeed(dur time.Duration) (speed, distance float64, durat
 	a.durations[0]=dur
 	a.pulses++
 	speed = a.configs.DistPerPulse / float64(dur.Seconds()) * 3.6
-	distance = float64(a.pulses)*float64(0.28)/1000
+	distance = float64(a.pulses)*a.configs.DistPerPulse
 	duration = time.Since(a.startTime)
 	return
 }

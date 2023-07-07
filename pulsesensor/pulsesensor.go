@@ -17,9 +17,11 @@ func NewPulseSensor(pulseInput gpio.GPIOPinIn) *pulseSensor {
 	}
 }
 
+const DUR = time.Millisecond * 100
+
 func (s *pulseSensor) Read() (bool, time.Duration) {
 	dur := time.Since(s.lastRead)
-	if dur >= time.Second/20 {
+	if dur >= DUR {
 		s.lastRead = time.Now()
 		return true, dur 
 	}

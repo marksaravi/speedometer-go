@@ -1,7 +1,7 @@
 package configs
 
 import (
-	"encoding/json"
+	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
 )
@@ -15,6 +15,6 @@ func ReadConfigs(path string) Configs {
 		log.Fatal(err)
 	}
 	var configs Configs
-	json.Unmarshal([]byte(content), &configs)
+	yaml.Unmarshal([]byte(content), &configs)
 	return configs
 }
