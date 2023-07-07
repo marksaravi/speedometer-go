@@ -51,7 +51,7 @@ func (d *display) Initialize() {
 func (d *display)SetInfo(speed float64, distance float64, duration time.Duration) {
 	d.writeSpeed(speed)
 	d.writeDistance(distance)
-	d.writeDuration(time.Second*1029)
+	d.writeDuration(duration)
 	d.sketcher.Update()
 }
 
@@ -117,7 +117,7 @@ func (d *display) writeDistance(distance float64) {
 
 func (d *display) writeDuration(duration time.Duration) {
 	const x float64 = 20
-	const y float64 = 310
+	const y float64 = 305
 	const xScale = 1
 	const yScale = 1
 

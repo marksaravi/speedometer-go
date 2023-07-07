@@ -8,6 +8,7 @@ import (
 
 	"github.com/marksaravi/drawings-go/drawings"
 	"github.com/marksaravi/speedometer-go/app"
+	"github.com/marksaravi/speedometer-go/configs"
 	"github.com/marksaravi/speedometer-go/display"
 	"github.com/marksaravi/speedometer-go/themes"
 	"github.com/marksaravi/speedometer-go/touch"
@@ -22,6 +23,7 @@ import (
 )
 
 func main() {
+	configs := configs.ReadConfigs("./configs.yaml")
 	host.Init()
 	log.SetFlags(log.Lmicroseconds)
 	log.Println("Starting Speedometer")
@@ -34,13 +36,13 @@ func main() {
 	lcdSpi := spi.NewSPI(1, 0, spi.Mode2, 64, 8)
 	dc := gpio.NewGPIOOut("GPIO22")
 	reset := gpio.NewGPIOOut("GPIO23")
-	ps := gpio.NewGPIOIn("GPIO23")
+	pulsePin := gpio.NewGPIOIn("GPIO17")
 	ili9341, err := ili9341.NewILI9341(ili9341.LCD_320x200, lcdSpi, dc, reset)
 	checkFatal(err)
 	skecher := drawings.NewSketcher(ili9341, colors.BLACK)
 	dis := display.NewDisplay(themes.Default, skecher, 4)
-	pulse := pulsesensor.NewPulseSensor(ps)
-	app := app.NewSpeedoApp(dis, pulse, touch)
+	pulse := pulsesensor.NewPulseSensor(pulsePin)
+	app := app.NewSpeedoApp(dis, pulse, touch, configs)
 
 	go func() {
 		fmt.Println("press ENTER to stop")

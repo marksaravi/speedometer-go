@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/marksaravi/speedometer-go/configs"
 	"github.com/marksaravi/speedometer-go/models"
 )
 
@@ -30,16 +31,19 @@ type speedoApp struct {
 	pulse   pulseSensor
 	touch   touchSensor
 
+	configs configs.Configs
+
 	durations       []time.Duration
 	pulses    int64
 	startTime time.Time
 }
 
-func NewSpeedoApp(display display, pulse pulseSensor, touch touchSensor) *speedoApp {
+func NewSpeedoApp(display display, pulse pulseSensor, touch touchSensor, configs configs.Configs) *speedoApp {
 	return &speedoApp{
 		display: display,
 		pulse:   pulse,
 		touch:   touch,
+		configs: configs,
 	}
 }
 
@@ -84,7 +88,7 @@ func (a *speedoApp) calcSpeed(dur time.Duration) (speed, distance float64, durat
 	}
 	a.durations[0]=dur
 	a.pulses++
-	speed = float64(0.28)/dur.Seconds()
+	speed = a.configs.DistPerPulse / float64(dur.Seconds()) * 3.6
 	distance = float64(a.pulses)*float64(0.28)/1000
 	duration = time.Since(a.startTime)
 	return
