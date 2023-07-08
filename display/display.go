@@ -43,15 +43,13 @@ func (d *display) Initialize() {
 	d.sketcher.Clear(colors.BLACK)
 	d.sketcher.ClearArea(d.xs, d.ys, d.xs+d.width, d.ys+d.height, d.theme.BackgroungColor)
 	d.writeLabels()
-	d.calibrationPoints()
-	d.writeSpeed(0)
 	d.sketcher.Update()
 }
 
 func (d *display)SetInfo(speed float64, distance float64, duration time.Duration) {
 	d.writeSpeed(speed)
 	d.writeDistance(distance)
-	// d.writeDuration(duration)
+	d.writeDuration(duration)
 	d.sketcher.Update()
 }
 
@@ -138,7 +136,7 @@ func (d *display) write(text string, font fonts.BitmapFont, color colors.Color, 
 }
 
 func (d *display) calibrationPoints() {
-	var PADDING float64 = 25
+	var PADDING float64 = 60
 	w := d.sketcher.ScreenWidth()
 	h := d.sketcher.ScreenHeight()
 	d.sketcher.FillCircle(PADDING, PADDING, float64(5), colors.RED)

@@ -11,6 +11,11 @@ import (
 
 const DUR_BUFF_LEN = 20
 
+const (
+	MENU_BUTTON = 1
+	RESET_BUTTON = 2
+)
+
 type display interface {
 	Initialize()
 	SetInfo(speed float64, distance float64, duration time.Duration)
@@ -31,6 +36,7 @@ type speedoApp struct {
 	pulse   pulseSensor
 	touch   touchSensor
 
+	buttons []button
 	configs configs.Configs
 
 	durations       []time.Duration
@@ -39,11 +45,37 @@ type speedoApp struct {
 }
 
 func NewSpeedoApp(display display, pulse pulseSensor, touch touchSensor, configs configs.Configs) *speedoApp {
+	menuButton := button {
+		active: true,
+		drawable: false,
+		text: "",
+		area: buttonArea {
+			x1: 20,
+			y1: 20,
+			x2: 220,
+			y2: 460,
+		},
+	}
+	resetButton := button {
+		active: false,
+		drawable: true,
+		text: "Reset",
+		area: buttonArea {
+			x1: 40,
+			y1: 60,
+			x2: 200,
+			y2: 120,
+		},
+	}
 	return &speedoApp{
 		display: display,
 		pulse:   pulse,
 		touch:   touch,
 		configs: configs,
+		buttons: []button {
+			resetButton,
+			menuButton,
+		},
 	}
 }
 
