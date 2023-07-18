@@ -84,7 +84,7 @@ func (a *speedoApp) Start(ctx context.Context) {
 
 	a.display.Initialize()
 	a.Reset()
-	// lastDisplay := time.Now()
+	lastDisplay := time.Now()
 	for {
 		select {
 		case <-ctx.Done():
@@ -95,17 +95,13 @@ func (a *speedoApp) Start(ctx context.Context) {
 		default:
 			ok, dur := a.pulse.Read()
 			if ok {
-				log.Printf("duration: %v\n", dur)
+				speed, distance, duration := a.calcSpeed(dur)
+				log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
+				if time.Since(lastDisplay) >= time.Second {
+					a.display.SetInfo(speed, distance, duration)
+					lastDisplay = time.Now()
+				}
 			}
-
-			// if ok {
-			// 	speed, distance, duration := a.calcSpeed(dur)
-			// 	if time.Since(lastDisplay) >= time.Second {
-			// 		a.display.SetInfo(speed, distance, duration)
-			// 		log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
-			// 		lastDisplay = time.Now()
-			// 	}
-			// }
 			time.Sleep(time.Millisecond)
 		}
 	}
