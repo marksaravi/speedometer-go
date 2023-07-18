@@ -19,8 +19,6 @@ func NewPulseSensor(pulsePinIn gpio.GPIOPinIn) *pulseSensor {
 	}
 }
 
-const DUR = time.Millisecond * 100
-
 func (s *pulseSensor) Read() (bool, time.Duration) {
 	pulsed := false
 	dur := time.Since(s.lastRead)
@@ -34,15 +32,3 @@ func (s *pulseSensor) Read() (bool, time.Duration) {
 	}
 	return pulsed, dur
 }
-
-// func (s *pulseSensor) readPulse() bool {
-// 	pulsed := false
-// 	level := s.pulsePinIn.Read()
-// 	if s.prevPulseLevel != level && level == gpio.Low {
-// 		s.pulseCounter++
-// 		pulsed = true
-// 		s.lastPulseReadTime = time.Now()
-// 	}
-// 	s.prevPulseLevel = level
-// 	return pulsed
-// }
