@@ -5,10 +5,16 @@ import (
 	"log"
 	"time"
 
+	"github.com/marksaravi/speedometer-go/configs"
 	"github.com/marksaravi/speedometer-go/models"
 )
 
 const DUR_BUFF_LEN = 20
+
+const (
+	MENU_BUTTON  = 1
+	RESET_BUTTON = 2
+)
 
 type display interface {
 	Initialize()
@@ -30,16 +36,46 @@ type speedoApp struct {
 	pulse   pulseSensor
 	touch   touchSensor
 
-	durations       []time.Duration
+	buttons []button
+	configs configs.Configs
+
+	durations []time.Duration
 	pulses    int64
 	startTime time.Time
 }
 
-func NewSpeedoApp(display display, pulse pulseSensor, touch touchSensor) *speedoApp {
+func NewSpeedoApp(display display, pulse pulseSensor, touch touchSensor, configs configs.Configs) *speedoApp {
+	menuButton := button{
+		active:   true,
+		drawable: false,
+		text:     "",
+		area: buttonArea{
+			x1: 20,
+			y1: 20,
+			x2: 220,
+			y2: 460,
+		},
+	}
+	resetButton := button{
+		active:   false,
+		drawable: true,
+		text:     "Reset",
+		area: buttonArea{
+			x1: 40,
+			y1: 60,
+			x2: 200,
+			y2: 120,
+		},
+	}
 	return &speedoApp{
 		display: display,
 		pulse:   pulse,
 		touch:   touch,
+		configs: configs,
+		buttons: []button{
+			resetButton,
+			menuButton,
+		},
 	}
 }
 
@@ -60,32 +96,33 @@ func (a *speedoApp) Start(ctx context.Context) {
 			ok, dur := a.pulse.Read()
 			if ok {
 				speed, distance, duration := a.calcSpeed(dur)
-				if time.Since(lastDisplay)>=time.Second {
+				log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
+				if time.Since(lastDisplay) >= time.Second {
 					a.display.SetInfo(speed, distance, duration)
-					log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
 					lastDisplay = time.Now()
 				}
 			}
+			time.Sleep(time.Millisecond)
 		}
 	}
 }
 
 func (a *speedoApp) Reset() {
 	a.durations = make([]time.Duration, DUR_BUFF_LEN)
-	for i:=0; i<DUR_BUFF_LEN; i++ {
-		a.durations[i]=time.Second*86400
+	for i := 0; i < DUR_BUFF_LEN; i++ {
+		a.durations[i] = time.Second * 86400
 	}
 	a.startTime = time.Now()
 }
 
 func (a *speedoApp) calcSpeed(dur time.Duration) (speed, distance float64, duration time.Duration) {
-	for i:=1; i<DUR_BUFF_LEN; i++ {
-		a.durations[i]=a.durations[i-1]
+	for i := 1; i < DUR_BUFF_LEN; i++ {
+		a.durations[i] = a.durations[i-1]
 	}
-	a.durations[0]=dur
+	a.durations[0] = dur
 	a.pulses++
-	speed = float64(0.28)/dur.Seconds()
-	distance = float64(a.pulses)*float64(0.28)/1000
+	speed = a.configs.DistPerPulse / float64(dur.Seconds()) * 3.6
+	distance = float64(a.pulses) * a.configs.DistPerPulse
 	duration = time.Since(a.startTime)
 	return
 }

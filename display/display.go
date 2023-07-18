@@ -22,7 +22,7 @@ type display struct {
 	xs, ys, width, height float64
 	speedArea             *area
 	distanceArea          *area
-	timeArea              *area
+	durationArea          *area
 }
 
 func NewDisplay(theme themes.Theme, sketcher drawings.Sketcher, margin float64) *display {
@@ -43,22 +43,13 @@ func (d *display) Initialize() {
 	d.sketcher.Clear(colors.BLACK)
 	d.sketcher.ClearArea(d.xs, d.ys, d.xs+d.width, d.ys+d.height, d.theme.BackgroungColor)
 	d.writeLabels()
-	d.calibrationPoints()
-	d.writeSpeed(0)
 	d.sketcher.Update()
-	// go func() {
-	// 	s1 := rand.NewSource(time.Now().UnixNano())
-	// 	r1 := rand.New(s1)
-	// 	for {
-	// 		d.writeSpeed(r1.Float64() * 100)
-	// 		d.sketcher.Update()
-	// 		time.Sleep(time.Second)
-	// 	}
-	// }()
 }
 
 func (d *display)SetInfo(speed float64, distance float64, duration time.Duration) {
 	d.writeSpeed(speed)
+	d.writeDistance(distance)
+	d.writeDuration(duration)
 	d.sketcher.Update()
 }
 
@@ -71,24 +62,9 @@ func (d *display) ResetChannel() <-chan bool {
 }
 
 func (d *display) writeLabels() {
-	d.write("Duration", fonts.FreeMono9pt7b, d.theme.DurationLabelColor, 4, 20, 1, 1, nil)
+	d.write("Distance", fonts.FreeMono9pt7b, d.theme.DurationLabelColor, 4, 20, 1, 1, nil)
 	d.write("Speed", fonts.FreeMono9pt7b, d.theme.DurationLabelColor, 4, 80, 1, 1, nil)
-	d.write("Distance", fonts.FreeMono9pt7b, d.theme.DurationLabelColor, 4, 260, 1, 1, nil)
-}
-
-func adjustArea(x1, y1, x2, y2 float64, a *area) {
-	if x1 < a.x1 {
-		a.x1 = x1
-	}
-	if y1 < a.y1 {
-		a.y1 = y1
-	}
-	if x2 > a.x2 {
-		a.x2 = x2
-	}
-	if y2 > a.y2 {
-		a.y2 = y2
-	}
+	d.write("Duration", fonts.FreeMono9pt7b, d.theme.DurationLabelColor, 4, 260, 1, 1, nil)
 }
 
 func (d *display) setArea(text string, x, y, xScale, yScale float64, a *area) *area {
@@ -124,8 +100,30 @@ func (d *display) writeSpeed(speed float64) {
 	const yScale = 4
 
 	text := fmt.Sprintf("%0.1f", speed)
-	d.sketcher.SetFont(fonts.FreeSans24pt7b)
 	d.speedArea = d.write(text, fonts.FreeSans24pt7b, d.theme.SpeedColor, x, y, xScale, yScale, d.speedArea)
+}
+
+func (d *display) writeDistance(distance float64) {
+	const x float64 = 20
+	const y float64 = 60
+	const xScale = 1
+	const yScale = 1
+
+	text := fmt.Sprintf("%0.1f", distance)
+	d.distanceArea = d.write(text, fonts.FreeSans24pt7b, d.theme.SpeedColor, x, y, xScale, yScale, d.distanceArea)
+}
+
+func (d *display) writeDuration(duration time.Duration) {
+	const x float64 = 20
+	const y float64 = 305
+	const xScale = 1
+	const yScale = 1
+
+	hour := int(duration.Seconds() / 3600)
+    minute := int(duration.Seconds()/60) % 60
+    second := int(duration.Seconds()) % 60
+	text := fmt.Sprintf("%02d:%02d:%02d", hour, minute, second)
+	d.durationArea = d.write(text, fonts.FreeSans24pt7b, d.theme.SpeedColor, x, y, xScale, yScale, d.durationArea)
 }
 
 func (d *display) write(text string, font fonts.BitmapFont, color colors.Color, x, y float64, xScale, yScale float64, area *area) *area {
@@ -138,7 +136,7 @@ func (d *display) write(text string, font fonts.BitmapFont, color colors.Color, 
 }
 
 func (d *display) calibrationPoints() {
-	var PADDING float64 = 25
+	var PADDING float64 = 60
 	w := d.sketcher.ScreenWidth()
 	h := d.sketcher.ScreenHeight()
 	d.sketcher.FillCircle(PADDING, PADDING, float64(5), colors.RED)
