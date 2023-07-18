@@ -12,7 +12,7 @@ import (
 const DUR_BUFF_LEN = 20
 
 const (
-	MENU_BUTTON = 1
+	MENU_BUTTON  = 1
 	RESET_BUTTON = 2
 )
 
@@ -39,28 +39,28 @@ type speedoApp struct {
 	buttons []button
 	configs configs.Configs
 
-	durations       []time.Duration
+	durations []time.Duration
 	pulses    int64
 	startTime time.Time
 }
 
 func NewSpeedoApp(display display, pulse pulseSensor, touch touchSensor, configs configs.Configs) *speedoApp {
-	menuButton := button {
-		active: true,
+	menuButton := button{
+		active:   true,
 		drawable: false,
-		text: "",
-		area: buttonArea {
+		text:     "",
+		area: buttonArea{
 			x1: 20,
 			y1: 20,
 			x2: 220,
 			y2: 460,
 		},
 	}
-	resetButton := button {
-		active: false,
+	resetButton := button{
+		active:   false,
 		drawable: true,
-		text: "Reset",
-		area: buttonArea {
+		text:     "Reset",
+		area: buttonArea{
 			x1: 40,
 			y1: 60,
 			x2: 200,
@@ -72,7 +72,7 @@ func NewSpeedoApp(display display, pulse pulseSensor, touch touchSensor, configs
 		pulse:   pulse,
 		touch:   touch,
 		configs: configs,
-		buttons: []button {
+		buttons: []button{
 			resetButton,
 			menuButton,
 		},
@@ -84,7 +84,7 @@ func (a *speedoApp) Start(ctx context.Context) {
 
 	a.display.Initialize()
 	a.Reset()
-	lastDisplay := time.Now()
+	// lastDisplay := time.Now()
 	for {
 		select {
 		case <-ctx.Done():
@@ -95,33 +95,38 @@ func (a *speedoApp) Start(ctx context.Context) {
 		default:
 			ok, dur := a.pulse.Read()
 			if ok {
-				speed, distance, duration := a.calcSpeed(dur)
-				if time.Since(lastDisplay)>=time.Second {
-					a.display.SetInfo(speed, distance, duration)
-					// log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
-					lastDisplay = time.Now()
-				}
+				log.Printf("duration: %v\n", dur)
 			}
+
+			// if ok {
+			// 	speed, distance, duration := a.calcSpeed(dur)
+			// 	if time.Since(lastDisplay) >= time.Second {
+			// 		a.display.SetInfo(speed, distance, duration)
+			// 		log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
+			// 		lastDisplay = time.Now()
+			// 	}
+			// }
+			time.Sleep(time.Millisecond)
 		}
 	}
 }
 
 func (a *speedoApp) Reset() {
 	a.durations = make([]time.Duration, DUR_BUFF_LEN)
-	for i:=0; i<DUR_BUFF_LEN; i++ {
-		a.durations[i]=time.Second*86400
+	for i := 0; i < DUR_BUFF_LEN; i++ {
+		a.durations[i] = time.Second * 86400
 	}
 	a.startTime = time.Now()
 }
 
 func (a *speedoApp) calcSpeed(dur time.Duration) (speed, distance float64, duration time.Duration) {
-	for i:=1; i<DUR_BUFF_LEN; i++ {
-		a.durations[i]=a.durations[i-1]
+	for i := 1; i < DUR_BUFF_LEN; i++ {
+		a.durations[i] = a.durations[i-1]
 	}
-	a.durations[0]=dur
+	a.durations[0] = dur
 	a.pulses++
 	speed = a.configs.DistPerPulse / float64(dur.Seconds()) * 3.6
-	distance = float64(a.pulses)*a.configs.DistPerPulse
+	distance = float64(a.pulses) * a.configs.DistPerPulse
 	duration = time.Since(a.startTime)
 	return
 }

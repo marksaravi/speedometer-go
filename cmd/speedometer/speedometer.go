@@ -10,9 +10,9 @@ import (
 	"github.com/marksaravi/speedometer-go/app"
 	"github.com/marksaravi/speedometer-go/configs"
 	"github.com/marksaravi/speedometer-go/display"
+	"github.com/marksaravi/speedometer-go/pulsesensor"
 	"github.com/marksaravi/speedometer-go/themes"
 	"github.com/marksaravi/speedometer-go/touch"
-	"github.com/marksaravi/speedometer-go/pulsesensor"
 	"periph.io/x/host/v3"
 
 	"github.com/marksaravi/drivers-go/colors"
@@ -36,7 +36,7 @@ func main() {
 	lcdSpi := spi.NewSPI(1, 0, spi.Mode2, 64, 8)
 	dc := gpio.NewGPIOOut("GPIO22")
 	reset := gpio.NewGPIOOut("GPIO23")
-	pulsePin := gpio.NewGPIOIn("GPIO17")
+	pulsePin := gpio.NewGPIOIn("GPIO27")
 	ili9341, err := ili9341.NewILI9341(ili9341.LCD_320x200, lcdSpi, dc, reset)
 	checkFatal(err)
 	skecher := drawings.NewSketcher(ili9341, colors.BLACK)
