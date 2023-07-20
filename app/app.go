@@ -39,9 +39,14 @@ type speedoApp struct {
 	buttons []button
 	configs configs.Configs
 
-	durations []time.Duration
-	pulses    int64
-	startTime time.Time
+	pulseCounter    int64
+	lastPulseTime   time.Time
+	pulseDuration   time.Duration
+	startTime       time.Time
+	lastDisplayTime time.Time
+	speed           float64
+	duration        time.Duration
+	distance        float64
 }
 
 func NewSpeedoApp(display display, pulse pulseSensor, touch touchSensor, configs configs.Configs) *speedoApp {
@@ -84,7 +89,6 @@ func (a *speedoApp) Start(ctx context.Context) {
 
 	a.display.Initialize()
 	a.Reset()
-	lastDisplay := time.Now()
 	for {
 		select {
 		case <-ctx.Done():
@@ -95,12 +99,13 @@ func (a *speedoApp) Start(ctx context.Context) {
 		default:
 			ok, dur := a.pulse.Read()
 			if ok {
-				speed, distance, duration := a.calcSpeed(dur)
-				log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
-				if time.Since(lastDisplay) >= time.Second {
-					a.display.SetInfo(speed, distance, duration)
-					lastDisplay = time.Now()
-				}
+				a.addPulse(dur)
+				// speed, distance, duration := a.calcSpeed(dur)
+				// log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
+				// if time.Since(lastDisplay) >= time.Second {
+				// 	a.display.SetInfo(speed, distance, duration)
+				// 	lastDisplay = time.Now()
+				// }
 			}
 			time.Sleep(time.Millisecond)
 		}
@@ -108,21 +113,21 @@ func (a *speedoApp) Start(ctx context.Context) {
 }
 
 func (a *speedoApp) Reset() {
-	a.durations = make([]time.Duration, DUR_BUFF_LEN)
-	for i := 0; i < DUR_BUFF_LEN; i++ {
-		a.durations[i] = time.Second * 86400
-	}
+	a.lastDisplayTime = time.Now()
 	a.startTime = time.Now()
+	a.lastPulseTime = time.Now().Add(-time.Second * 86400)
+	a.pulseDuration = time.Since(a.lastPulseTime)
+	a.pulseCounter = 0
 }
 
-func (a *speedoApp) calcSpeed(dur time.Duration) (speed, distance float64, duration time.Duration) {
-	for i := 1; i < DUR_BUFF_LEN; i++ {
-		a.durations[i] = a.durations[i-1]
-	}
-	a.durations[0] = dur
-	a.pulses++
-	speed = a.configs.DistPerPulse / float64(dur.Seconds()) * 3.6
-	distance = float64(a.pulses) * a.configs.DistPerPulse
-	duration = time.Since(a.startTime)
+func (a *speedoApp) addPulse(dur time.Duration) {
+	a.lastPulseTime = time.Now()
+	a.pulseCounter++
+}
+
+func (a *speedoApp) calcSpeed() (speed, distance float64, duration time.Duration) {
+	speed = a.configs.DistPerPulse / float64(a.pulseDuration.Seconds()) * 3.6
+	a.distance = float64(a.pulseCounter) * a.configs.DistPerPulse
+	a.duration = time.Since(a.startTime)
 	return
 }
