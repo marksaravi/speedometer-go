@@ -75,7 +75,21 @@ func (d *display)SetInfo(speed float64, distance float64, duration time.Duration
 	d.sketcher.Update()
 }
 
+func (d *display) setButton(id int, visible bool) {
+	btn := d.buttons[id]
+	btn.visible = visible
+	d.buttons[id] = btn
+}
+
 func (d *display) Touched(x, y float64) {
+	btn := d.buttons[RESET_BUTTON]
+	if btn.visible {
+		d.setButton(RESET_BUTTON, true)
+	} else {
+		if btn.isTapped(x, y) {
+			d.setButton(RESET_BUTTON, false)
+		}
+	}
 	log.Printf("TOUCH: %f,%f\n", x, y)
 }
 
@@ -175,4 +189,8 @@ func (d *display) drawButton(id int) {
 	d.sketcher.SetFont(fonts.FreeSans24pt7b)
 	d.sketcher.MoveCursor(btn.area.x1 + 20, btn.area.y2 - 14)
 	d.sketcher.WriteScaled(btn.label, 1, 1, colors.RED)
+}
+
+func (b *button) isTapped(x, y float64) bool {
+	return x > b.area.x1 && x < b.area.x2 && y > b.area.y1 && y < b.area.y2 
 }

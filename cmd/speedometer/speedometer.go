@@ -21,7 +21,13 @@ import (
 	"github.com/marksaravi/drivers-go/hardware/spi"
 	"github.com/marksaravi/drivers-go/hardware/xpt2046"
 )
+/*
+		{ xt: 512, yt: 512, xs:60, ys: 60 },
+		{ xt: 1800, yt: 512, xs:260, ys: 60 },
+		{ xt: 512, yt: 1600, xs:60, ys: 180 },
+		{ xt: 1800, yt: 1600, xs:260, ys: 180 },
 
+*/
 func main() {
 	configs := configs.ReadConfigs("./configs.yaml")
 	host.Init()
@@ -32,7 +38,7 @@ func main() {
 	touchSpi := spi.NewSPI(0, 0, spi.Mode0, 11, 8)
 	xpt2046, err := xpt2046.NewXPT2046(ctx, &wg, touchSpi, 20)
 	checkFatal(err)
-	touch := touch.NewTouch(xpt2046.TouchChannel)
+	touch := touch.NewTouch(xpt2046.TouchChannel, 512, 1600, 512, 1800, 60, 60, 180, 260)
 	lcdSpi := spi.NewSPI(1, 0, spi.Mode2, 64, 8)
 	dc := gpio.NewGPIOOut("GPIO22")
 	reset := gpio.NewGPIOOut("GPIO23")
