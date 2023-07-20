@@ -29,6 +29,7 @@ type pulseSensor interface {
 
 type touchSensor interface {
 	Touched() <-chan models.XY
+	TouchConvert(xy models.XY) (float64, float64)
 }
 
 type speedoApp struct {
@@ -95,7 +96,8 @@ func (a *speedoApp) Start(ctx context.Context) {
 			return
 		case <-a.display.ResetChannel():
 		case xy := <-a.touch.Touched():
-			a.display.Touched(xy.X, xy.Y)
+			x, y := a.touch.TouchConvert(xy)
+			a.display.Touched(x, y)
 		default:
 			ok := a.pulse.Read()
 			if ok {

@@ -42,7 +42,7 @@ func NewDisplay(theme themes.Theme, sketcher drawings.Sketcher, margin float64) 
 	sketcher.SetRotation(drawings.ROTATION_90)
 	resetArea:= area { x1:40, y1:100, x2: 200, y2: 160, }
 	resetButton := button {
-		id: RESET_BUTTON, label: "Reset", area: resetArea, visible: true,
+		id: RESET_BUTTON, label: "Reset", area: resetArea, visible: false,
 	}
 	buttons := make(map[int]button);
 	buttons[RESET_BUTTON] = resetButton
@@ -83,7 +83,7 @@ func (d *display) setButton(id int, visible bool) {
 
 func (d *display) Touched(x, y float64) {
 	btn := d.buttons[RESET_BUTTON]
-	if btn.visible {
+	if !btn.visible {
 		d.setButton(RESET_BUTTON, true)
 	} else {
 		if btn.isTapped(x, y) {
