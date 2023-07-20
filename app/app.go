@@ -24,7 +24,7 @@ type display interface {
 }
 
 type pulseSensor interface {
-	Read() (bool, time.Duration)
+	Read() bool
 }
 
 type touchSensor interface {
@@ -97,12 +97,11 @@ func (a *speedoApp) Start(ctx context.Context) {
 		case xy := <-a.touch.Touched():
 			a.display.Touched(xy.X, xy.Y)
 		default:
-			ok, dur := a.pulse.Read()
+			ok := a.pulse.Read()
 			if ok {
-				a.addPulse(dur)
+				a.addPulse()
 			}
 			a.calcSpeed()
-			time.Sleep(time.Millisecond)
 			if time.Since(a.lastDisplayTime) > time.Second {
 				a.lastDisplayTime = time.Now()
 				go func(speed, distance float64, duration time.Duration) {
@@ -121,7 +120,8 @@ func (a *speedoApp) Reset() {
 	a.pulseCounter = 0
 }
 
-func (a *speedoApp) addPulse(dur time.Duration) {
+func (a *speedoApp) addPulse() {
+	a.pulseDuration = time.Since(a.lastPulseTime)
 	a.lastPulseTime = time.Now()
 	a.pulseCounter++
 }
