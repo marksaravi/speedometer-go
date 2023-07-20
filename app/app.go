@@ -100,14 +100,15 @@ func (a *speedoApp) Start(ctx context.Context) {
 			ok, dur := a.pulse.Read()
 			if ok {
 				a.addPulse(dur)
-				// speed, distance, duration := a.calcSpeed(dur)
-				// log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
-				// if time.Since(lastDisplay) >= time.Second {
-				// 	a.display.SetInfo(speed, distance, duration)
-				// 	lastDisplay = time.Now()
-				// }
 			}
+			a.calcSpeed()
 			time.Sleep(time.Millisecond)
+			if time.Since(a.lastDisplayTime) > time.Second {
+				a.lastDisplayTime = time.Now()
+				go func(speed, distance float64, duration time.Duration) {
+					a.display.SetInfo(speed, distance, duration)
+				}(a.speed, a.distance, a.duration)
+			}
 		}
 	}
 }
@@ -116,7 +117,7 @@ func (a *speedoApp) Reset() {
 	a.lastDisplayTime = time.Now()
 	a.startTime = time.Now()
 	a.lastPulseTime = time.Now().Add(-time.Second * 86400)
-	a.pulseDuration = time.Since(a.lastPulseTime)
+	a.pulseDuration = time.Since(a.lastPulseTime) / 2
 	a.pulseCounter = 0
 }
 
@@ -125,9 +126,11 @@ func (a *speedoApp) addPulse(dur time.Duration) {
 	a.pulseCounter++
 }
 
-func (a *speedoApp) calcSpeed() (speed, distance float64, duration time.Duration) {
-	speed = a.configs.DistPerPulse / float64(a.pulseDuration.Seconds()) * 3.6
+func (a *speedoApp) calcSpeed() {
+	if time.Since(a.lastPulseTime) > a.pulseDuration {
+		a.pulseDuration = time.Since(a.lastPulseTime)
+	}
+	a.speed = a.configs.DistPerPulse / float64(a.pulseDuration.Seconds()) * 3.6
 	a.distance = float64(a.pulseCounter) * a.configs.DistPerPulse
 	a.duration = time.Since(a.startTime)
-	return
 }
