@@ -11,8 +11,19 @@ import (
 	"github.com/marksaravi/speedometer-go/themes"
 )
 
+const (
+	RESET_BUTTON = 10
+)
+
 type area struct {
 	x1, x2, y1, y2 float64
+}
+
+type button struct {
+	id       int
+	visible  bool
+	area     area
+	label    string
 }
 
 type display struct {
@@ -23,11 +34,18 @@ type display struct {
 	speedArea             *area
 	distanceArea          *area
 	durationArea          *area
+	buttons               map[int]button
 }
 
 func NewDisplay(theme themes.Theme, sketcher drawings.Sketcher, margin float64) *display {
 	resetChannel := make(chan bool)
 	sketcher.SetRotation(drawings.ROTATION_90)
+	resetArea:= area { x1:40, y1:100, x2: 200, y2: 160, }
+	resetButton := button {
+		id: RESET_BUTTON, label: "Reset", area: resetArea, visible: true,
+	}
+	buttons := make(map[int]button);
+	buttons[RESET_BUTTON] = resetButton
 	return &display{
 		theme:        theme,
 		resetChannel: resetChannel,
@@ -36,6 +54,7 @@ func NewDisplay(theme themes.Theme, sketcher drawings.Sketcher, margin float64) 
 		ys:           margin,
 		width:        float64(sketcher.ScreenWidth()) - 2*margin,
 		height:       float64(sketcher.ScreenHeight()) - 2*margin,
+		buttons: buttons,
 	}
 }
 
@@ -50,6 +69,9 @@ func (d *display)SetInfo(speed float64, distance float64, duration time.Duration
 	d.writeSpeed(speed)
 	d.writeDistance(distance)
 	d.writeDuration(duration)
+	if d.buttons[RESET_BUTTON].visible {
+		d.drawButton(RESET_BUTTON)
+	}
 	d.sketcher.Update()
 }
 
@@ -145,4 +167,12 @@ func (d *display) calibrationPoints() {
 	d.sketcher.FillCircle(w-PADDING, h-PADDING, float64(5), colors.RED)
 	fmt.Printf("(%5.0f,%5.0f),(%5.0f,%5.0f),(%5.0f,%5.0f),(%5.0f,%5.0f)",
 		PADDING, PADDING, w-PADDING, PADDING, PADDING, h-PADDING, w-PADDING, h-PADDING)
+}
+
+func (d *display) drawButton(id int) {
+	btn := d.buttons[id]
+	d.sketcher.FillRectangle(btn.area.x1,btn.area.y1,btn.area.x2,btn.area.y2, colors.YELLOW)
+	d.sketcher.SetFont(fonts.FreeSans24pt7b)
+	d.sketcher.MoveCursor(btn.area.x1 + 20, btn.area.y2 - 14)
+	d.sketcher.WriteScaled(btn.label, 1, 1, colors.RED)
 }
