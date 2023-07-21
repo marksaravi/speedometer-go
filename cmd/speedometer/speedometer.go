@@ -38,7 +38,7 @@ func main() {
 	touchSpi := spi.NewSPI(0, 0, spi.Mode0, 11, 8)
 	xpt2046, err := xpt2046.NewXPT2046(ctx, &wg, touchSpi, 20)
 	checkFatal(err)
-	touch := touch.NewTouch(xpt2046.TouchChannel, 512, 512, 1600, 1800, 60, 60, 180, 260)
+	touch := touch.NewTouch(xpt2046.TouchChannel)
 	lcdSpi := spi.NewSPI(1, 0, spi.Mode2, 64, 8)
 	dc := gpio.NewGPIOOut("GPIO22")
 	reset := gpio.NewGPIOOut("GPIO23")

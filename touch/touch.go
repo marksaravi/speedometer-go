@@ -9,9 +9,11 @@ type touch struct {
 	ax, bx, ay, by float64
 }
 
-func NewTouch(touched chan models.XY, x1t, y1t, x2t, y2t, x1s, y1s, x2s, y2s float64) *touch {
-	ax, bx := ConverionFactors(x1t, x2t, x1s, x2s)
-	ay, by := ConverionFactors(y1t, y2t, y1s, y2s)
+func NewTouch(touched chan models.XY) *touch {
+	//512, 1600        1600, 1008
+	//40, 100          200, 160
+	ax, bx := ConverionFactors(512, 1600, 40, 200)
+	ay, by := ConverionFactors(1600, 1008, 100, 160)
 	return &touch{
 		touched: touched,
 		ax: ax,

@@ -19,7 +19,7 @@ const (
 type display interface {
 	Initialize()
 	SetInfo(speed float64, distance float64, duration time.Duration)
-	Touched(x, y float64)
+	Touched(x, y float64) bool
 	ResetChannel() <-chan bool
 }
 
@@ -97,7 +97,9 @@ func (a *speedoApp) Start(ctx context.Context) {
 		case <-a.display.ResetChannel():
 		case xy := <-a.touch.Touched():
 			x, y := a.touch.TouchConvert(xy)
-			a.display.Touched(x, y)
+			if a.display.Touched(x, y) {
+				a.Reset()
+			}
 		default:
 			ok := a.pulse.Read()
 			if ok {

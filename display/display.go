@@ -81,16 +81,20 @@ func (d *display) setButton(id int, visible bool) {
 	d.buttons[id] = btn
 }
 
-func (d *display) Touched(x, y float64) {
+func (d *display) Touched(x, y float64) bool {
+	tapped := false
 	btn := d.buttons[RESET_BUTTON]
 	if !btn.visible {
 		d.setButton(RESET_BUTTON, true)
 	} else {
 		if btn.isTapped(x, y) {
-			d.setButton(RESET_BUTTON, false)
+			tapped = true
+			fmt.Println("RESET")
 		}
+		d.setButton(RESET_BUTTON, false)
 	}
 	log.Printf("TOUCH: %f,%f\n", x, y)
+	return tapped
 }
 
 func (d *display) ResetChannel() <-chan bool {
