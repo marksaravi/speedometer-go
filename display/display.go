@@ -92,6 +92,7 @@ func (d *display) Touched(x, y float64) bool {
 			fmt.Println("RESET")
 		}
 		d.setButton(RESET_BUTTON, false)
+		d.clearButton(RESET_BUTTON)
 	}
 	log.Printf("TOUCH: %f,%f\n", x, y)
 	return tapped
@@ -193,6 +194,11 @@ func (d *display) drawButton(id int) {
 	d.sketcher.SetFont(fonts.FreeSans24pt7b)
 	d.sketcher.MoveCursor(btn.area.x1 + 20, btn.area.y2 - 14)
 	d.sketcher.WriteScaled(btn.label, 1, 1, colors.RED)
+}
+
+func (d *display) clearButton(id int) {
+	btn := d.buttons[id]
+	d.sketcher.FillRectangle(btn.area.x1,btn.area.y1,btn.area.x2,btn.area.y2,  d.theme.BackgroungColor)
 }
 
 func (b *button) isTapped(x, y float64) bool {
