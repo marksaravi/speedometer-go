@@ -19,16 +19,17 @@ const (
 type display interface {
 	Initialize()
 	SetInfo(speed float64, distance float64, duration time.Duration)
-	Touched(x, y float64)
+	Touched(x, y float64) bool
 	ResetChannel() <-chan bool
 }
 
 type pulseSensor interface {
-	Read() (bool, time.Duration)
+	Read() bool
 }
 
 type touchSensor interface {
 	Touched() <-chan models.XY
+	TouchConvert(xy models.XY) (float64, float64)
 }
 
 type speedoApp struct {
@@ -39,9 +40,14 @@ type speedoApp struct {
 	buttons []button
 	configs configs.Configs
 
-	durations []time.Duration
-	pulses    int64
-	startTime time.Time
+	pulseCounter    int64
+	lastPulseTime   time.Time
+	pulseDuration   time.Duration
+	startTime       time.Time
+	lastDisplayTime time.Time
+	speed           float64
+	duration        time.Duration
+	distance        float64
 }
 
 func NewSpeedoApp(display display, pulse pulseSensor, touch touchSensor, configs configs.Configs) *speedoApp {
@@ -84,45 +90,51 @@ func (a *speedoApp) Start(ctx context.Context) {
 
 	a.display.Initialize()
 	a.Reset()
-	lastDisplay := time.Now()
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-a.display.ResetChannel():
 		case xy := <-a.touch.Touched():
-			a.display.Touched(xy.X, xy.Y)
-		default:
-			ok, dur := a.pulse.Read()
-			if ok {
-				speed, distance, duration := a.calcSpeed(dur)
-				log.Printf("%6.2f, %6.2f, %v\n", speed, distance, duration)
-				if time.Since(lastDisplay) >= time.Second {
-					a.display.SetInfo(speed, distance, duration)
-					lastDisplay = time.Now()
-				}
+			x, y := a.touch.TouchConvert(xy)
+			if a.display.Touched(x, y) {
+				a.Reset()
 			}
-			time.Sleep(time.Millisecond)
+		default:
+			ok := a.pulse.Read()
+			if ok {
+				a.addPulse()
+			}
+			a.calcSpeed()
+			if time.Since(a.lastDisplayTime) > time.Second {
+				a.lastDisplayTime = time.Now()
+				go func(speed, distance float64, duration time.Duration) {
+					a.display.SetInfo(speed, distance, duration)
+				}(a.speed, a.distance, a.duration)
+			}
 		}
 	}
 }
 
 func (a *speedoApp) Reset() {
-	a.durations = make([]time.Duration, DUR_BUFF_LEN)
-	for i := 0; i < DUR_BUFF_LEN; i++ {
-		a.durations[i] = time.Second * 86400
-	}
+	a.lastDisplayTime = time.Now()
 	a.startTime = time.Now()
+	a.lastPulseTime = time.Now().Add(-time.Second * 86400)
+	a.pulseDuration = time.Since(a.lastPulseTime) / 2
+	a.pulseCounter = 0
 }
 
-func (a *speedoApp) calcSpeed(dur time.Duration) (speed, distance float64, duration time.Duration) {
-	for i := 1; i < DUR_BUFF_LEN; i++ {
-		a.durations[i] = a.durations[i-1]
+func (a *speedoApp) addPulse() {
+	a.pulseDuration = time.Since(a.lastPulseTime)
+	a.lastPulseTime = time.Now()
+	a.pulseCounter++
+}
+
+func (a *speedoApp) calcSpeed() {
+	if time.Since(a.lastPulseTime) > a.pulseDuration {
+		a.pulseDuration = time.Since(a.lastPulseTime)
 	}
-	a.durations[0] = dur
-	a.pulses++
-	speed = a.configs.DistPerPulse / float64(dur.Seconds()) * 3.6
-	distance = float64(a.pulses) * a.configs.DistPerPulse
-	duration = time.Since(a.startTime)
-	return
+	a.speed = a.configs.DistPerPulse / float64(a.pulseDuration.Seconds()) * 3.6
+	a.distance = float64(a.pulseCounter) * a.configs.DistPerPulse
+	a.duration = time.Since(a.startTime)
 }

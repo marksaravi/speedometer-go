@@ -8,7 +8,7 @@ import (
 
 type pulseSensor struct {
 	lastRead   time.Time
-	isHigh     bool
+	wasHigh    bool
 	pulsePinIn gpio.GPIOPinIn
 }
 
@@ -19,16 +19,15 @@ func NewPulseSensor(pulsePinIn gpio.GPIOPinIn) *pulseSensor {
 	}
 }
 
-func (s *pulseSensor) Read() (bool, time.Duration) {
+func (s *pulseSensor) Read() bool {
 	pulsed := false
-	dur := time.Since(s.lastRead)
-	isHigh := s.pulsePinIn.Read()
-	if isHigh != s.isHigh {
-		if isHigh {
+	wasHigh := s.pulsePinIn.Read()
+	if wasHigh != s.wasHigh {
+		if wasHigh {
 			pulsed = true
 		}
-		s.isHigh = isHigh
+		s.wasHigh = wasHigh
 		s.lastRead = time.Now()
 	}
-	return pulsed, dur
+	return pulsed
 }

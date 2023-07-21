@@ -21,7 +21,13 @@ import (
 	"github.com/marksaravi/drivers-go/hardware/spi"
 	"github.com/marksaravi/drivers-go/hardware/xpt2046"
 )
+/*
+		{ xt: 512, yt: 512, xs:60, ys: 60 },
+		{ xt: 1800, yt: 512, xs:260, ys: 60 },
+		{ xt: 512, yt: 1600, xs:60, ys: 180 },
+		{ xt: 1800, yt: 1600, xs:260, ys: 180 },
 
+*/
 func main() {
 	configs := configs.ReadConfigs("./configs.yaml")
 	host.Init()
