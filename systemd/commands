@@ -1,0 +1,6 @@
+sudo nano /lib/systemd/system/speedometer.service
+sudo systemctl enable speedometer.service
+
+sudo systemctl --type=service --state=running
+sudo systemctl start speedometer.service
+

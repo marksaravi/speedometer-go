@@ -1,0 +1,12 @@
+Unit]
+Description=Speedometer
+After=multi-user.target
+
+[Service]
+StandardOutput=null
+StandardError=journal
+WorkingDirectory=/home/pi/go/src/speedometer-go
+ExecStart=/home/pi/go/src/speedometer-go/speedometer
+
+[Install]
+WantedBy=multi-user.target

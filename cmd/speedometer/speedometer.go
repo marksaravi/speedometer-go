@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+//	"fmt"
 	"log"
 	"sync"
 
@@ -33,7 +33,7 @@ func main() {
 	host.Init()
 	log.SetFlags(log.Lmicroseconds)
 	log.Println("Starting Speedometer")
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, _ /*cancel*/ := context.WithCancel(context.Background())
 	var wg sync.WaitGroup
 	touchSpi := spi.NewSPI(0, 0, spi.Mode0, 11, 8)
 	xpt2046, err := xpt2046.NewXPT2046(ctx, &wg, touchSpi, 20)
@@ -50,11 +50,11 @@ func main() {
 	pulse := pulsesensor.NewPulseSensor(pulsePin)
 	app := app.NewSpeedoApp(dis, pulse, touch, configs)
 
-	go func() {
-		fmt.Println("press ENTER to stop")
-		fmt.Scanln()
-		cancel()
-	}()
+//	go func() {
+//		fmt.Println("press ENTER to stop")
+//		fmt.Scanln()
+//		cancel()
+//	}()
 
 	app.Start(ctx)
 	wg.Wait()
