@@ -20,10 +20,10 @@ type area struct {
 }
 
 type button struct {
-	id       int
-	visible  bool
-	area     area
-	label    string
+	id      int
+	visible bool
+	area    area
+	label   string
 }
 
 type display struct {
@@ -40,11 +40,11 @@ type display struct {
 func NewDisplay(theme themes.Theme, sketcher drawings.Sketcher, margin float64) *display {
 	resetChannel := make(chan bool)
 	sketcher.SetRotation(drawings.ROTATION_90)
-	resetArea:= area { x1:40, y1:100, x2: 200, y2: 160, }
-	resetButton := button {
+	resetArea := area{x1: 40, y1: 100, x2: 200, y2: 160}
+	resetButton := button{
 		id: RESET_BUTTON, label: "Reset", area: resetArea, visible: false,
 	}
-	buttons := make(map[int]button);
+	buttons := make(map[int]button)
 	buttons[RESET_BUTTON] = resetButton
 	return &display{
 		theme:        theme,
@@ -54,7 +54,7 @@ func NewDisplay(theme themes.Theme, sketcher drawings.Sketcher, margin float64) 
 		ys:           margin,
 		width:        float64(sketcher.ScreenWidth()) - 2*margin,
 		height:       float64(sketcher.ScreenHeight()) - 2*margin,
-		buttons: buttons,
+		buttons:      buttons,
 	}
 }
 
@@ -65,7 +65,7 @@ func (d *display) Initialize() {
 	d.sketcher.Update()
 }
 
-func (d *display)SetInfo(speed float64, distance float64, duration time.Duration) {
+func (d *display) SetInfo(speed float64, distance float64, duration time.Duration) {
 	d.writeSpeed(speed)
 	d.writeDistance(distance)
 	d.writeDuration(duration)
@@ -104,8 +104,9 @@ func (d *display) ResetChannel() <-chan bool {
 
 func (d *display) writeLabels() {
 	d.write("Distance", fonts.FreeMono9pt7b, d.theme.DurationLabelColor, 4, 20, 1, 1, nil)
-	d.write("Speed", fonts.FreeMono9pt7b, d.theme.DurationLabelColor, 4, 80, 1, 1, nil)
+	d.write("Speed (km/h)", fonts.FreeMono9pt7b, d.theme.DurationLabelColor, 4, 80, 1, 1, nil)
 	d.write("Duration", fonts.FreeMono9pt7b, d.theme.DurationLabelColor, 4, 260, 1, 1, nil)
+	d.write("km/h", fonts.FreeMono9pt7b, d.theme.DurationLabelColor, 185, 250, 1, 1, nil)
 }
 
 func (d *display) setArea(text string, x, y, xScale, yScale float64, a *area) *area {
@@ -161,8 +162,8 @@ func (d *display) writeDuration(duration time.Duration) {
 	const yScale = 1
 
 	hour := int(duration.Seconds() / 3600)
-    minute := int(duration.Seconds()/60) % 60
-    second := int(duration.Seconds()) % 60
+	minute := int(duration.Seconds()/60) % 60
+	second := int(duration.Seconds()) % 60
 	text := fmt.Sprintf("%02d:%02d:%02d", hour, minute, second)
 	d.durationArea = d.write(text, fonts.FreeSans24pt7b, d.theme.SpeedColor, x, y, xScale, yScale, d.durationArea)
 }
@@ -190,17 +191,17 @@ func (d *display) calibrationPoints() {
 
 func (d *display) drawButton(id int) {
 	btn := d.buttons[id]
-	d.sketcher.FillRectangle(btn.area.x1,btn.area.y1,btn.area.x2,btn.area.y2, colors.YELLOW)
+	d.sketcher.FillRectangle(btn.area.x1, btn.area.y1, btn.area.x2, btn.area.y2, colors.YELLOW)
 	d.sketcher.SetFont(fonts.FreeSans24pt7b)
-	d.sketcher.MoveCursor(btn.area.x1 + 20, btn.area.y2 - 14)
+	d.sketcher.MoveCursor(btn.area.x1+20, btn.area.y2-14)
 	d.sketcher.WriteScaled(btn.label, 1, 1, colors.RED)
 }
 
 func (d *display) clearButton(id int) {
 	btn := d.buttons[id]
-	d.sketcher.FillRectangle(btn.area.x1,btn.area.y1,btn.area.x2,btn.area.y2,  d.theme.BackgroungColor)
+	d.sketcher.FillRectangle(btn.area.x1, btn.area.y1, btn.area.x2, btn.area.y2, d.theme.BackgroungColor)
 }
 
 func (b *button) isTapped(x, y float64) bool {
-	return x > b.area.x1 && x < b.area.x2 && y > b.area.y1 && y < b.area.y2 
+	return x > b.area.x1 && x < b.area.x2 && y > b.area.y1 && y < b.area.y2
 }
