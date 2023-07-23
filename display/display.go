@@ -151,7 +151,10 @@ func (d *display) writeDistance(distance float64) {
 	const xScale = 1
 	const yScale = 1
 
-	text := fmt.Sprintf("%0.1f", distance)
+	text := fmt.Sprintf("%0.1f m", distance)
+	if distance > 1000 {
+		text = fmt.Sprintf("%0.1f km", distance/1000)
+	}
 	d.distanceArea = d.write(text, fonts.FreeSans24pt7b, d.theme.SpeedColor, x, y, xScale, yScale, d.distanceArea)
 }
 
@@ -190,16 +193,26 @@ func (d *display) calibrationPoints() {
 }
 
 func (d *display) drawButton(id int) {
+	const R = float64(10)
+	const color = colors.YELLOW
 	btn := d.buttons[id]
-	d.sketcher.FillRectangle(btn.area.x1, btn.area.y1, btn.area.x2, btn.area.y2, colors.YELLOW)
+	d.sketcher.FillCircle(btn.area.x1 + R, btn.area.y1 + R, R, color) 
+	d.sketcher.FillCircle(btn.area.x1 + R, btn.area.y2 - R, R, color)
+	d.sketcher.FillCircle(btn.area.x2 - R, btn.area.y1 + R, R, color)
+	d.sketcher.FillCircle(btn.area.x2 - R, btn.area.y2 - R, R, color)
+	d.sketcher.FillRectangle(btn.area.x1 +R , btn.area.y1, btn.area.x2 -R, btn.area.y2+1, color)
+	//d.sketcher.Rectangle(btn.area.x1 +R + 1, btn.area.y1, btn.area.x2 -R + 1, btn.area.y2, colors.BLUE)
+	d.sketcher.FillRectangle(btn.area.x1 , btn.area.y1 + R, btn.area.x1 + R, btn.area.y2 - R, color)
+	d.sketcher.FillRectangle(btn.area.x2 - R , btn.area.y1 + R, btn.area.x2, btn.area.y2 - R, color)
 	d.sketcher.SetFont(fonts.FreeSans24pt7b)
 	d.sketcher.MoveCursor(btn.area.x1+20, btn.area.y2-14)
 	d.sketcher.WriteScaled(btn.label, 1, 1, colors.RED)
 }
 
 func (d *display) clearButton(id int) {
+	const M = float64(1)
 	btn := d.buttons[id]
-	d.sketcher.FillRectangle(btn.area.x1, btn.area.y1, btn.area.x2, btn.area.y2, d.theme.BackgroungColor)
+	d.sketcher.FillRectangle(btn.area.x1 - M, btn.area.y1 - M, btn.area.x2 + M, btn.area.y2 + M, d.theme.BackgroungColor)
 }
 
 func (b *button) isTapped(x, y float64) bool {
